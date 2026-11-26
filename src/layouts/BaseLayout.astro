@@ -1,0 +1,80 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../config/site';
+
+interface Props {
+  title: string;
+  description?: string | undefined;
+  /** Absolute or root-relative image for social cards. */
+  ogImage?: string | undefined;
+  ogType?: 'website' | 'article';
+  canonical?: string | undefined;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  publishedTime?: Date | undefined;
+  modifiedTime?: Date | undefined;
+}
+
+const { title, description = site.description, ogImage = '/og/default.png', ogType = 'website', noindex = false, jsonLd, publishedTime, modifiedTime } =
+  Astro.props;
+const canonical = new URL(Astro.props.canonical ?? Astro.url.pathname, Astro.site).href;
+const fullTitle = title === site.name ? `${site.name}: ${site.tagline}` : `${title} · ${site.name}`;
+const image = new URL(ogImage, Astro.site).href;
+// JSON-LD is a data block (not executed), so CSP script-src does not apply. Escape "<" so
+// no value can close the tag.
+const ld = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : null;
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/InstrumentSans-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} RSS`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_GB" />
+    {publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    {ld && <script is:inline type="application/ld+json" set:html={ld} />}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: absolute; left: var(--space-4); top: var(--space-2); z-index: var(--z-skip);
+    transform: translateY(-200%); padding: var(--space-2) var(--space-4);
+    background: var(--color-accent); color: var(--color-on-accent); border-radius: var(--radius-md); font-weight: 600;
+  }
+  .skip-link:focus { transform: none; }
+  main:focus { outline: none; }
+</style>

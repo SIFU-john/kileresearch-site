@@ -1,0 +1,47 @@
+---
+import { formConfig } from '../../lib/forms/config';
+import { site } from '../../config/site';
+const cfg = formConfig('newsletter');
+const id = 'nl';
+---
+<section class="newsletter" aria-labelledby={`${id}-title`}>
+  <h2 id={`${id}-title`}>New research in your inbox</h2>
+  <p class="muted">One email when we publish. No tracking pixels, unsubscribe any time.</p>
+  <form
+    class="nl-form"
+    data-form-kind="newsletter"
+    data-provider={cfg.provider}
+    data-endpoint={cfg.endpoint}
+    data-mailto={site.contactEmail}
+    data-mailto-subject="Newsletter sign-up"
+    method="post"
+    action={cfg.endpoint ?? ''}
+  >
+    <div class="field">
+      <label for={`${id}-email`}>Email address</label>
+      <div class="row">
+        <input class="input" id={`${id}-email`} name="email" type="email" autocomplete="email" required aria-describedby={`${id}-email-error`} />
+        <button class="btn btn-primary" type="submit">Subscribe</button>
+      </div>
+      <p class="field-error" id={`${id}-email-error`} hidden></p>
+    </div>
+    <div class="hp" aria-hidden="true"><label>Leave empty <input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
+    <div class="alert alert-success" data-status="success" tabindex="-1" hidden><p>Thanks. Please check your inbox to confirm.</p></div>
+    <div class="alert alert-info" data-status="fallback" tabindex="-1" hidden>
+      <p>Sign-ups aren't switched on yet. <a data-mailto-link href={`mailto:${site.contactEmail}?subject=Newsletter%20sign-up`}>Email us</a> and we'll add you by hand.</p>
+    </div>
+    <div class="alert alert-danger" data-status="error" tabindex="-1" hidden>
+      <p>That didn't go through. Please try again, or <a data-mailto-link href={`mailto:${site.contactEmail}`}>email us</a>.</p>
+    </div>
+  </form>
+</section>
+<script>
+  import '../../lib/forms/client';
+</script>
+<style>
+  .newsletter { padding: var(--space-8) var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg-subtle); }
+  .newsletter h2 { font-size: var(--text-2xl); margin-bottom: var(--space-2); }
+  .nl-form { margin-top: var(--space-5); display: grid; gap: var(--space-4); }
+  .row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .row .input { flex: 1 1 16rem; width: auto; }
+</style>

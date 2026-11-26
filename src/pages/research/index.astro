@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Search from '../../components/Search.astro';
+import TagFilter from '../../components/TagFilter.astro';
+import { getArticles } from '../../lib/content';
+const articles = await getArticles();
+---
+<BaseLayout title="Research" description="Every Kile Research article: hands-on, reproducible guides to AI and LLM inference for beginner to intermediate readers.">
+  <div class="container section">
+    <header class="stack head">
+      <p class="overline">Research</p>
+      <h1>All research</h1>
+      <p class="lead">Hands-on guides that teach one idea at a time. Every number was measured, and the code is public.</p>
+    </header>
+    <Search />
+    <TagFilter articles={articles} />
+    <h2 class="visually-hidden">Articles</h2>
+    <div class="grid list">{articles.map((a) => <ArticleCard article={a} />)}</div>
+  </div>
+</BaseLayout>
+<style>
+  .head { margin-bottom: var(--space-8); }
+  .list { margin-top: var(--space-8); }
+</style>

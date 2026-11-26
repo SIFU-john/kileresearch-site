@@ -1,0 +1,14 @@
+---
+import { authors } from '../config/authors';
+interface Props { id: keyof typeof authors }
+const a = authors[Astro.props.id];
+---
+<aside class="author card" aria-label="About the author">
+  <p class="overline">Written by</p>
+  <p class="name"><a href={a.url}>{a.name}</a></p>
+  <p class="muted">{a.bio}</p>
+</aside>
+<style>
+  .name { font-weight: var(--weight-semibold); font-size: var(--text-lg); }
+  .author:hover { box-shadow: var(--shadow-1); border-color: var(--color-border); }
+</style>

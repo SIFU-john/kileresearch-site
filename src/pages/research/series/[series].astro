@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import TagFilter from '../../../components/TagFilter.astro';
+import { getArticles, seriesUrl, slugify, type Article } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await getArticles();
+  const names = [...new Set(all.flatMap((a) => (a.data.series ? [a.data.series.name] : [])))];
+  return names.map((name) => ({
+    params: { series: slugify(name) },
+    props: { all, name, items: all.filter((a) => a.data.series?.name === name).sort((a, b) => a.data.series!.part - b.data.series!.part) },
+  }));
+}
+interface Props { all: Article[]; name: string; items: Article[] }
+const { all, name, items } = Astro.props;
+---
+<BaseLayout title={name} description={`Every part of the ${name} series from Kile Research, in reading order, with runnable code for each step.`}>
+  <div class="container section">
+    <p class="overline"><a href="/research/">Research</a> / Series</p>
+    <h1>{name}</h1>
+    <p class="lead">{items.length} parts so far, in reading order. Each one teaches one idea and ends with something you built and measured yourself.</p>
+    <TagFilter articles={all} current={seriesUrl(name)} />
+    <div class="grid list">{items.map((a) => <ArticleCard article={a} headingLevel="h2" />)}</div>
+  </div>
+</BaseLayout>
+<style>
+  h1 { margin-block: var(--space-3); }
+  .list { margin-top: var(--space-8); }
+  .overline a { color: inherit; }
+</style>

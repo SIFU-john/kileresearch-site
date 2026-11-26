@@ -1,0 +1,129 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Toc from '../../components/Toc.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import ReproduceLink from '../../components/ReproduceLink.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import NewsletterForm from '../../components/forms/NewsletterForm.astro';
+import ConsultingCta from '../../components/ConsultingCta.astro';
+import CodeCopy from '../../components/CodeCopy.astro';
+import { authors } from '../../config/authors';
+import { site, repoUrl } from '../../config/site';
+import { getArticles, articleUrl, formatDate, readingMinutes, relatedArticles, seriesUrl, tagLabel, tagUrl, type Article } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await getArticles();
+  return all.map((article) => ({ params: { slug: article.id }, props: { article, all } }));
+}
+
+interface Props { article: Article; all: Article[] }
+const { article, all } = Astro.props;
+const { Content, headings } = await render(article);
+const d = article.data;
+const minutes = readingMinutes(article);
+const related = relatedArticles(article, all);
+const inSeries = d.series ? all.filter((a) => a.data.series?.name === d.series!.name).sort((a, b) => a.data.series!.part - b.data.series!.part) : [];
+const idx = inSeries.findIndex((a) => a.id === article.id);
+const prev = idx > 0 ? inSeries[idx - 1] : undefined;
+const next = idx >= 0 && idx < inSeries.length - 1 ? inSeries[idx + 1] : undefined;
+const url = new URL(articleUrl(article), Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: d.title,
+  description: d.description,
+  datePublished: d.date.toISOString(),
+  dateModified: (d.updated ?? d.date).toISOString(),
+  author: { '@type': 'Organization', name: authors[d.author].name, url: new URL(authors[d.author].url, Astro.site).href },
+  publisher: { '@type': 'Organization', name: site.name, url: new URL('/', Astro.site).href },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': d.canonical ?? url },
+  image: new URL(`/og/${article.id}.png`, Astro.site).href,
+  keywords: d.tags.join(', '),
+  wordCount: article.body?.split(/\s+/).length,
+  proficiencyLevel: 'Beginner',
+  ...(d.series && { isPartOf: { '@type': 'CreativeWorkSeries', name: d.series.name } }),
+  ...(d.repoPath && { codeRepository: repoUrl(d.repoPath) }),
+};
+---
+<BaseLayout
+  title={d.title}
+  description={d.description}
+  ogType="article"
+  ogImage={`/og/${article.id}.png`}
+  canonical={d.canonical}
+  noindex={d.draft}
+  jsonLd={jsonLd}
+  publishedTime={d.date}
+  modifiedTime={d.updated}
+>
+  <article class="container article">
+    <header class="article-header">
+      <p class="overline">
+        {d.series ? <a href={seriesUrl(d.series.name)}>{d.series.name}{d.series.week && `, Week ${d.series.week}`} · Part {d.series.part}</a> : 'Research'}
+      </p>
+      <h1>{d.title}</h1>
+      <p class="lead">{d.description}</p>
+      <p class="meta muted">
+        <span>By <a href={authors[d.author].url}>{authors[d.author].name}</a></span>
+        <span aria-hidden="true">·</span>
+        <time datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
+        {d.updated && <><span aria-hidden="true">·</span><span>Updated <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time></span></>}
+        <span aria-hidden="true">·</span>
+        <span>{minutes} min read</span>
+      </p>
+      <ul class="tags" aria-label="Tags">{d.tags.map((t) => <li><a class="tag" href={tagUrl(t)}>{tagLabel(t)}</a></li>)}</ul>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar no-print" aria-label="Table of contents"><div class="sticky"><Toc headings={headings} /></div></aside>
+      <div class="body">
+        <div class="prose" data-pagefind-body>
+          <Content />
+        </div>
+
+        <div class="after">
+          {d.repoPath && <ReproduceLink repoPath={d.repoPath} />}
+          {(prev || next) && (
+            <nav class="series-nav" aria-label="More in this series">
+              {prev ? <a class="card" href={articleUrl(prev)} rel="prev"><span class="overline">← Previous: Part {prev.data.series!.part}</span><span>{prev.data.title}</span></a> : <span />}
+              {next && <a class="card next" href={articleUrl(next)} rel="next"><span class="overline">Next: Part {next.data.series!.part} →</span><span>{next.data.title}</span></a>}
+            </nav>
+          )}
+          <AuthorBox id={d.author} />
+          <NewsletterForm />
+          <ConsultingCta compact />
+        </div>
+      </div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="container section related" aria-labelledby="related-title">
+      <h2 id="related-title">Related research</h2>
+      <div class="grid">{related.map((a) => <ArticleCard article={a} />)}</div>
+    </section>
+  )}
+  <CodeCopy />
+</BaseLayout>
+
+<style>
+  .article { padding-top: var(--space-12); }
+  .article-header { max-width: 52rem; display: grid; gap: var(--space-4); margin-bottom: var(--space-10); }
+  .article-header .overline a { color: inherit; text-decoration: none; }
+  .article-header .overline a:hover { text-decoration: underline; }
+  .meta { display: flex; flex-wrap: wrap; gap: var(--space-2); font-size: var(--text-sm); }
+  .layout { display: grid; gap: var(--space-8); }
+  .after { max-width: var(--measure); margin-top: var(--space-16); display: grid; gap: var(--space-8); }
+  .series-nav { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .series-nav a { text-decoration: none; color: var(--color-text-strong); font-weight: var(--weight-semibold); }
+  .series-nav .next { text-align: right; }
+  .related h2 { font-size: var(--text-2xl); margin-bottom: var(--space-6); }
+  .related { padding-bottom: 0; }
+  @media (min-width: 64rem) {
+    .layout { grid-template-columns: minmax(0, 1fr) 15rem; }
+    .sidebar { order: 2; }
+    .sticky { position: sticky; top: var(--space-8); max-height: calc(100vh - var(--space-16)); overflow-y: auto; padding-left: var(--space-6); border-left: 1px solid var(--color-border); }
+  }
+</style>

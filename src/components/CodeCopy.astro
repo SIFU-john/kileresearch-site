@@ -1,0 +1,31 @@
+---
+// Adds a "Copy" button to every article code block. Progressive enhancement:
+// without JS (or without the Clipboard API) the code is still selectable.
+---
+<p class="visually-hidden" aria-live="polite" id="copy-status"></p>
+<script>
+  const status = document.getElementById('copy-status');
+  if (navigator.clipboard) {
+    for (const block of document.querySelectorAll<HTMLElement>('.prose .code-block')) {
+      const pre = block.querySelector('pre');
+      if (!pre) continue;
+      const lang = block.dataset['lang'];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', lang ? `Copy ${lang} code` : 'Copy code');
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.innerText.replace(/\n$/, ''));
+          btn.textContent = 'Copied';
+          if (status) status.textContent = 'Code copied to clipboard';
+        } catch {
+          btn.textContent = 'Press Ctrl+C';
+        }
+        setTimeout(() => { btn.textContent = 'Copy'; if (status) status.textContent = ''; }, 2000);
+      });
+      block.append(btn);
+    }
+  }
+</script>

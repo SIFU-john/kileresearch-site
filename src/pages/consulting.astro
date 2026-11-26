@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+// STUB: placeholder copy and tiers. Final copy comes from Copy (Chris) and layout from Iris (KILA-42).
+const problems = [
+  { title: '“Should we run AI ourselves or pay for an API?”', body: 'We measure both on your workload and show the cost, speed and privacy trade-offs in plain numbers.' },
+  { title: '“Our AI feature feels slow.”', body: 'We benchmark time to first token, throughput and cold starts, find the bottleneck and fix the biggest one first.' },
+  { title: '“We handle sensitive data.”', body: 'We design private, self-hosted or region-locked setups with security and data protection built in from day one.' },
+  { title: '“We don’t know if it’s any good.”', body: 'We set up a small, repeatable evaluation so you can check quality before and after every change.' },
+];
+const tiers = [
+  { name: '[Tier 1: Assessment]', price: '[Price TBC]', items: ['[Placeholder] Short discovery call', '[Placeholder] Written options and trade-offs', '[Placeholder] Recommended next step'] },
+  { name: '[Tier 2: Pilot]', price: '[Price TBC]', items: ['[Placeholder] Working proof of concept', '[Placeholder] Benchmarks on your data', '[Placeholder] Security review of the design'] },
+  { name: '[Tier 3: Build and support]', price: '[Price TBC]', items: ['[Placeholder] Production deployment', '[Placeholder] Monitoring and evaluation', '[Placeholder] Ongoing support'] },
+];
+const steps = [
+  ['Talk', 'A short call to understand your goal, data and constraints.'],
+  ['Measure', 'We test real options on your workload and share the raw numbers.'],
+  ['Recommend', 'A clear written plan with costs, risks and trade-offs.'],
+  ['Build', 'If you go ahead, we build it securely and hand over everything.'],
+];
+---
+<BaseLayout title="Consulting for small and mid-sized businesses" description="Kile Research helps small and mid-sized businesses choose, run and measure AI models: practical, private and secure by default.">
+  <section class="hero" data-surface="ink">
+    <div class="container stack">
+      <p class="overline">Consulting</p>
+      <h1>Practical AI for small and mid-sized businesses</h1>
+      <p class="lead">We bring the same measured, reproducible approach from our research to your business. No hype, just numbers you can check and systems you can trust.</p>
+      <p><a class="btn btn-primary" href="/contact/">Book an intro call</a></p>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="problems-title">
+    <h2 id="problems-title">Problems we solve</h2>
+    <ul class="grid list">{problems.map((p) => <li class="card"><h3>{p.title}</h3><p class="muted">{p.body}</p></li>)}</ul>
+  </section>
+
+  <section class="band" aria-labelledby="tiers-title">
+    <div class="container section">
+      <h2 id="tiers-title">Ways to work with us</h2>
+      <p class="alert alert-info note"><span>Placeholder: offer tiers and prices are still being defined.</span></p>
+      <ul class="grid list">
+        {tiers.map((t) => (
+          <li class="card tier">
+            <h3>{t.name}</h3>
+            <p class="price">{t.price}</p>
+            <ul>{t.items.map((i) => <li>{i}</li>)}</ul>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="process-title">
+    <h2 id="process-title">How it works</h2>
+    <ol class="steps">{steps.map(([t, b], i) => <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p class="muted">{b}</p></div></li>)}</ol>
+  </section>
+
+  <section class="container">
+    <div class="enquire card">
+      <h2>Tell us what you're trying to do</h2>
+      <p class="muted">We'll reply within two working days with honest advice, even if that's “you don't need us”.</p>
+      <p><a class="btn btn-primary" href="/contact/">Start an enquiry</a></p>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .hero { padding-block: var(--space-section); }
+  .hero h1 { max-width: 20ch; }
+  h2 { font-size: var(--text-3xl); }
+  .list { list-style: none; padding: 0; margin: var(--space-8) 0 0; }
+  .card h3 { font-size: var(--text-xl); }
+  .band { background: var(--color-bg-subtle); border-block: 1px solid var(--color-border); }
+  .note { margin-top: var(--space-4); }
+  .note span { color: var(--color-text); }
+  .price { font-size: var(--text-lg); font-weight: var(--weight-semibold); color: var(--color-accent); }
+  .tier ul { margin: 0; padding-left: 1.2em; }
+  .steps { list-style: none; padding: 0; margin: var(--space-8) 0 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .steps li { display: flex; gap: var(--space-4); }
+  .steps h3 { font-size: var(--text-xl); }
+  .n { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: var(--radius-pill); background: var(--color-bg-accent); color: var(--color-accent); font-weight: var(--weight-bold); }
+  .enquire { padding: var(--space-10); align-items: flex-start; }
+  .enquire:hover { box-shadow: var(--shadow-1); border-color: var(--color-border); }
+</style>

@@ -1,0 +1,23 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const items = Astro.props.headings.filter((h) => h.depth === 2);
+---
+{items.length > 2 && (
+  <nav class="toc" aria-labelledby="toc-title">
+    <details open>
+      <summary id="toc-title">On this page</summary>
+      <ul>
+        {items.map((h) => <li><a href={`#${h.slug}`}>{h.text.replace(/#$/, '')}</a></li>)}
+      </ul>
+    </details>
+  </nav>
+)}
+
+<style>
+  .toc { font-size: var(--text-sm); }
+  summary { cursor: pointer; font-weight: var(--weight-semibold); color: var(--color-text-strong); min-height: var(--target-min); display: flex; align-items: center; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+  a { color: var(--color-text-muted); text-decoration: none; display: inline-block; padding-block: var(--space-1); }
+  a:hover { color: var(--color-link); text-decoration: underline; }
+</style>

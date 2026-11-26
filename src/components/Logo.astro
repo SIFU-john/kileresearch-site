@@ -1,0 +1,19 @@
+---
+// Placeholder application of the KILA-32 "signal mark" + wordmark for Kile Research.
+// Replace with Iris's final artwork from KILA-42 when it lands.
+---
+<span class="logo">
+  <svg class="mark" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">
+    <rect width="32" height="32" rx="7" fill="currentColor" class="mark-bg"></rect>
+    <path d="M7 16h9m4 0h5" stroke="var(--signal-400)" stroke-width="3" stroke-linecap="round"></path>
+  </svg>
+  <span class="wordmark">Kile <span class="muted-word">Research</span></span>
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-text-strong); }
+  .mark { color: var(--ink-950); }
+  @media (prefers-color-scheme: dark) { .mark { color: var(--ink-800); } }
+  .wordmark { font-weight: var(--weight-semibold); letter-spacing: -0.02em; font-size: 1.2rem; }
+  .muted-word { font-weight: var(--weight-regular); color: var(--color-text-muted); }
+</style>

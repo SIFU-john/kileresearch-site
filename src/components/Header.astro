@@ -1,0 +1,33 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../config/site';
+const path = Astro.url.pathname;
+---
+<header class="site-header">
+  <div class="container bar">
+    <a href="/" class="home" aria-label="Kile Research home"><Logo /></a>
+    <nav aria-label="Main">
+      <ul>
+        {site.nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-6); padding-block: var(--space-3); }
+  .home { text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  ul { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); list-style: none; margin: 0; padding: 0; }
+  nav a {
+    display: inline-flex; align-items: center; min-height: var(--target-min); padding-inline: var(--space-3);
+    color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); border-radius: var(--radius-md);
+  }
+  nav a:hover { background: var(--color-bg-subtle); color: var(--color-text-strong); }
+  nav a[aria-current='page'] { color: var(--color-accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  @media (max-width: 30rem) { nav a { padding-inline: var(--space-2); } }
+</style>

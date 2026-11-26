@@ -1,0 +1,27 @@
+---
+import { articleUrl, formatDate, readingMinutes, tagLabel, type Article } from '../lib/content';
+interface Props { article: Article; headingLevel?: 'h2' | 'h3' }
+const { article, headingLevel = 'h3' } = Astro.props;
+const { title, description, date, series, tags, draft } = article.data;
+const H = headingLevel;
+---
+<article class="card article-card">
+  <p class="overline">
+    {series ? `${series.name} · Part ${series.part}` : 'Research'}{draft && ' · Draft'}
+  </p>
+  <H class="title"><a href={articleUrl(article)}>{title}</a></H>
+  <p class="muted desc">{description}</p>
+  <p class="meta"><time datetime={date.toISOString()}>{formatDate(date)}</time> · {readingMinutes(article)} min read</p>
+  <ul class="tags" aria-label="Tags">{tags.slice(0, 3).map((t) => <li><span class="tag">{tagLabel(t)}</span></li>)}</ul>
+</article>
+
+<style>
+  .title { font-size: var(--text-xl); }
+  .title a { color: inherit; text-decoration: none; }
+  .title a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .title a:focus-visible { outline: none; box-shadow: none; }
+  .article-card:has(a:focus-visible) { outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset); }
+  .article-card:hover .title a { color: var(--color-link); }
+  .desc { flex: 1; }
+  .meta { font-size: var(--text-sm); color: var(--color-text-muted); }
+</style>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import TagFilter from '../../../components/TagFilter.astro';
+import { getArticles, tagLabel, tagUrl, type Article } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await getArticles();
+  const tags = [...new Set(all.flatMap((a) => a.data.tags))];
+  return tags.map((tag) => ({ params: { tag }, props: { all, tag, items: all.filter((a) => a.data.tags.includes(tag)) } }));
+}
+interface Props { all: Article[]; tag: string; items: Article[] }
+const { all, tag, items } = Astro.props;
+---
+<BaseLayout title={`Research on ${tagLabel(tag)}`} description={`Kile Research articles about ${tagLabel(tag)}: hands-on, reproducible guides to AI and LLM inference.`}>
+  <div class="container section">
+    <p class="overline"><a href="/research/">Research</a> / Topic</p>
+    <h1>{tagLabel(tag)}</h1>
+    <p class="lead">{items.length} article{items.length === 1 ? '' : 's'}</p>
+    <TagFilter articles={all} current={tagUrl(tag)} />
+    <div class="grid list">{items.map((a) => <ArticleCard article={a} headingLevel="h2" />)}</div>
+  </div>
+</BaseLayout>
+<style>
+  h1 { text-transform: capitalize; margin-block: var(--space-3); }
+  .list { margin-top: var(--space-8); }
+  .overline a { color: inherit; }
+</style>
