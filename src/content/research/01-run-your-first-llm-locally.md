@@ -10,6 +10,7 @@ series:
 author: kile-research
 repoPath: scripts/hello_llm.py
 readingTime: 6
+level: beginner
 draft: false
 ---
 When you type a question into ChatGPT, your words go to a data center. A big computer runs a model on them and sends the answer back. That step, where a trained model runs and makes an answer, is called **inference**.

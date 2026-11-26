@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../config/site';
+const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquiry from the Kile Research website')}`;
+---
+<BaseLayout title="Please email us" description="Our enquiry form isn't switched on yet." noindex>
+  <div class="container section page-prose">
+    <h1>Please email us instead</h1>
+    <p>Our enquiry form isn't switched on yet, so your message wasn't sent. Please email <a href={mailto}>{site.contactEmail}</a> with the same details.</p>
+    <p><a href="/contact/">Back to the contact page</a></p>
+  </div>
+</BaseLayout>

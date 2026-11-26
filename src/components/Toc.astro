@@ -1,23 +1,33 @@
 ---
+// KILA-42 doc 2 §8. H2s (plus H3s when there are more than 6 H2s); hidden with fewer than 3.
+// `variant="inline"` is a closed <details> (below xl); `variant="rail"` is the sticky rail (xl+).
+// CSS shows exactly one of them, so only one is ever in the accessibility tree.
 import type { MarkdownHeading } from 'astro';
-interface Props { headings: MarkdownHeading[] }
-const items = Astro.props.headings.filter((h) => h.depth === 2);
+interface Props { headings: MarkdownHeading[]; variant: 'inline' | 'rail' }
+const { headings, variant } = Astro.props;
+const h2s = headings.filter((h) => h.depth === 2);
+const withH3 = h2s.length > 6;
+type Item = { slug: string; text: string; children: { slug: string; text: string }[] };
+const items: Item[] = [];
+for (const h of headings) {
+  if (h.depth === 2) items.push({ slug: h.slug, text: h.text, children: [] });
+  else if (h.depth === 3 && withH3 && items.length) items.at(-1)!.children.push({ slug: h.slug, text: h.text });
+}
+const id = `toc-title-${variant}`;
 ---
-{items.length > 2 && (
-  <nav class="toc" aria-labelledby="toc-title">
-    <details open>
-      <summary id="toc-title">On this page</summary>
-      <ul>
-        {items.map((h) => <li><a href={`#${h.slug}`}>{h.text.replace(/#$/, '')}</a></li>)}
-      </ul>
+{h2s.length >= 3 && (
+  variant === 'inline' ? (
+    <details class="toc toc-inline no-print">
+      <summary>On this page ({h2s.length} sections)</summary>
+      <nav aria-label="On this page">
+        <ol>{items.map((i) => <li><a href={`#${i.slug}`}>{i.text}</a>{i.children.length > 0 && <ol>{i.children.map((c) => <li><a href={`#${c.slug}`}>{c.text}</a></li>)}</ol>}</li>)}</ol>
+      </nav>
     </details>
-  </nav>
+  ) : (
+    <nav class="toc" aria-labelledby={id} id="contents" data-toc-rail>
+      <h2 id={id}>On this page</h2>
+      <ol>{items.map((i) => <li><a href={`#${i.slug}`}>{i.text}</a>{i.children.length > 0 && <ol>{i.children.map((c) => <li><a href={`#${c.slug}`}>{c.text}</a></li>)}</ol>}</li>)}</ol>
+      <p class="toc-cta"><a href="/consulting/">Work with Kile Research →</a></p>
+    </nav>
+  )
 )}
-
-<style>
-  .toc { font-size: var(--text-sm); }
-  summary { cursor: pointer; font-weight: var(--weight-semibold); color: var(--color-text-strong); min-height: var(--target-min); display: flex; align-items: center; }
-  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
-  a { color: var(--color-text-muted); text-decoration: none; display: inline-block; padding-block: var(--space-1); }
-  a:hover { color: var(--color-link); text-decoration: underline; }
-</style>

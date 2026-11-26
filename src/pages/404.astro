@@ -3,10 +3,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Page not found" description="The page you were looking for doesn't exist." noindex>
   <div class="container section stack">
-    <p class="overline">404</p>
     <h1>We couldn't find that page</h1>
-    <p class="lead">It may have moved when we left Medium. Try the research index or search.</p>
-    <p class="actions"><a class="btn btn-primary" href="/research/">Browse research</a> <a class="btn btn-secondary" href="/">Go home</a></p>
+    <p class="lead">It may have moved when we left Medium. Try searching our research.</p>
+    <form class="search" role="search" action="/research/" method="get">
+      <label for="nf-q">Search research</label>
+      <div class="row"><input class="input" id="nf-q" name="q" type="search" /><button class="btn btn-secondary" type="submit">Search</button></div>
+    </form>
+    <p class="actions"><a class="btn btn-primary" href="/research/">Browse research</a> <a href="/">Go home</a></p>
   </div>
 </BaseLayout>
-<style>.actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }</style>
+<style>
+  .search { display: grid; gap: var(--space-2); max-width: 32rem; }
+  .search label { font-weight: var(--weight-medium); }
+  .row { display: flex; gap: var(--space-2); }
+  .actions { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: center; }
+</style>

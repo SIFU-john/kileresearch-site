@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import ArticleCard from '../../../components/ArticleCard.astro';
-import TagFilter from '../../../components/TagFilter.astro';
+import ArticleRow from '../../../components/ArticleRow.astro';
+import FilterNav from '../../../components/FilterNav.astro';
 import { getArticles, tagLabel, tagUrl, type Article } from '../../../lib/content';
 
 export async function getStaticPaths() {
@@ -12,17 +12,18 @@ export async function getStaticPaths() {
 interface Props { all: Article[]; tag: string; items: Article[] }
 const { all, tag, items } = Astro.props;
 ---
-<BaseLayout title={`Research on ${tagLabel(tag)}`} description={`Kile Research articles about ${tagLabel(tag)}: hands-on, reproducible guides to AI and LLM inference.`}>
+<BaseLayout title={`Research on ${tagLabel(tag)}`} description={`Kile Research articles about ${tagLabel(tag)}: plain-language, reproducible write-ups on AI and LLM inference.`}>
   <div class="container section">
-    <p class="overline"><a href="/research/">Research</a> / Topic</p>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="/research/">Research</a> / Topic</nav>
     <h1>{tagLabel(tag)}</h1>
     <p class="lead">{items.length} article{items.length === 1 ? '' : 's'}</p>
-    <TagFilter articles={all} current={tagUrl(tag)} />
-    <div class="grid list">{items.map((a) => <ArticleCard article={a} headingLevel="h2" />)}</div>
+    <FilterNav articles={all} current={tagUrl(tag)} />
+    <ol class="list-reset list" reversed>{items.map((a) => <li><ArticleRow article={a} headingLevel="h2" /></li>)}</ol>
   </div>
 </BaseLayout>
 <style>
+  .crumb { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .crumb a { color: inherit; }
   h1 { text-transform: capitalize; margin-block: var(--space-3); }
-  .list { margin-top: var(--space-8); }
-  .overline a { color: inherit; }
+  .list { margin-top: var(--space-6); border-top: 1px solid var(--color-rule); max-width: 52rem; }
 </style>

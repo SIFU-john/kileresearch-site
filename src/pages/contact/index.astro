@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactForm from '../../components/forms/ContactForm.astro';
+import { site } from '../../config/site';
+---
+<BaseLayout title="Contact" description="Get in touch with Kile Research about consulting for your business, our research, or a correction." enquiry>
+  <div class="container section cols">
+    <div class="intro">
+      <h1>Contact</h1>
+      <p class="lead">Questions about an article, a correction, or AI for your business: we read everything.</p>
+      <p>Prefer email? Write to <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.</p>
+      <p class="muted small">This address works once email is set up on our domain.</p>
+    </div>
+    <div>
+      <h2 class="visually-hidden">Send us a message</h2>
+      <ContactForm idPrefix="ct" />
+    </div>
+  </div>
+</BaseLayout>
+<style>
+  .cols { display: grid; gap: var(--space-10); }
+  @media (min-width: 64rem) { .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 36rem); } }
+  .intro { display: grid; gap: var(--space-4); align-content: start; }
+  .small { font-size: var(--text-sm); }
+</style>

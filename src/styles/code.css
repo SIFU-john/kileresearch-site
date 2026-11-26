@@ -1,37 +1,50 @@
-/* Code blocks: Prism class-based highlighting (CSP-safe), colours tuned for AA contrast
-   on the ink-950 code surface in both light and dark mode. */
-.code-block { position: relative; }
-pre[class*="language-"], .prose pre {
-  margin: 0; padding: var(--space-5) var(--space-5); overflow-x: auto;
-  background: var(--ink-950); color: var(--ink-100);
-  border: 1px solid var(--ink-800); border-radius: var(--radius-lg);
-  font-family: var(--font-mono); font-size: 0.875rem; line-height: 1.65; tab-size: 2;
+/* Code blocks (KILA-42 doc 2 §4). Highlighting is Prism: it emits class names only, so the
+   strict CSP (style-src 'self') holds. Shiki, including its css-variables theme, writes
+   style="" attributes on every token, which would need 'unsafe-inline'. Prism classes are
+   mapped to the same --code-* tokens the Shiki bridge uses, so colours and contrast match doc 4. */
+.code-block {
+  position: relative; background: var(--code-bg); color: var(--code-fg);
+  border: 1px solid var(--code-border); border-radius: var(--radius-md); overflow: hidden;
 }
-pre code { font-family: inherit; background: none; border: 0; padding: 0; }
-.prose pre:focus-visible { outline-color: var(--signal-300); }
-.code-lang {
-  position: absolute; top: 0; left: var(--space-5); transform: translateY(-50%);
-  padding: 0 var(--space-2); border-radius: var(--radius-sm); background: var(--ink-800); color: var(--ink-300);
-  font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6;
+.code-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  min-height: 2.5rem; padding-inline: var(--space-5) var(--space-1); border-bottom: 1px solid var(--code-border);
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-overline);
+  text-transform: uppercase; color: var(--code-comment);
 }
-.copy-btn {
-  position: absolute; top: var(--space-2); right: var(--space-2);
-  min-height: 2rem; min-width: var(--target-min); padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--ink-600); border-radius: var(--radius-md); background: var(--ink-900); color: var(--ink-100);
-  font: inherit; font-size: var(--text-sm); cursor: pointer;
+.code-block pre {
+  margin: 0; padding: var(--space-4) var(--space-5); overflow-x: auto;
+  background: none; color: inherit;
+  font-family: var(--font-mono); font-size: var(--text-code); line-height: var(--leading-code); tab-size: 2;
 }
-.copy-btn:hover { border-color: var(--ink-300); }
-.copy-btn:focus-visible { outline-color: var(--signal-300); box-shadow: 0 0 0 var(--focus-offset) var(--ink-950); }
+.code-block pre:focus-visible { outline-offset: -4px; box-shadow: none; }
+.code-block pre code { font: inherit; background: none; border: 0; padding: 0; white-space: pre; }
+.code-block[data-wrap] pre code { white-space: pre-wrap; }
 
-/* Token colours (contrast vs #0B1220): all ≥ 7:1 except comments (≥ 5.5:1) */
-.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #A3AEC4; font-style: italic; }
-.token.punctuation { color: #C9D1E0; }
-.token.property, .token.tag, .token.constant, .token.symbol, .token.deleted { color: #FF8A80; }
-.token.boolean, .token.number { color: #FBBF24; }
-.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #5EEAD4; }
-.token.operator, .token.entity, .token.url, .token.variable { color: #E6EAF2; }
-.token.atrule, .token.attr-value, .token.function, .token.class-name { color: #93B4FF; }
-.token.keyword { color: #C4B5FD; }
-.token.regex, .token.important { color: #FBBF24; }
-.token.important, .token.bold { font-weight: bold; }
+.copy-btn {
+  display: inline-flex; align-items: center; gap: var(--space-1); min-height: var(--target-min); min-width: var(--target-min);
+  padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm); background: none; color: var(--code-fg);
+  font-family: var(--font-sans); font-size: var(--text-sm); letter-spacing: 0; text-transform: none; cursor: pointer;
+}
+.copy-btn::before {
+  content: ""; width: 0.9rem; height: 0.9rem; border: 1.5px solid currentColor; border-radius: 2px;
+  box-shadow: 3px -3px 0 -1.5px var(--code-bg), 3px -3px 0 0 currentColor;
+}
+.copy-btn:hover { background: var(--code-inline-bg); text-decoration: underline; }
+.copy-btn[data-state="error"] { white-space: normal; text-align: left; max-width: 18rem; }
+
+/* Token colours: every value is a --code-* token (>= 5:1 on --code-bg in both themes). */
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--code-comment); font-style: italic; }
+.token.punctuation, .token.operator { color: var(--code-punctuation); }
+.token.keyword, .token.atrule, .token.important, .token.selector { color: var(--code-keyword); }
+.token.string, .token.char, .token.attr-value, .token.regex, .token.url, .token.inserted { color: var(--code-string); }
+.token.number, .token.boolean, .token.constant, .token.symbol, .token.deleted { color: var(--code-number); }
+.token.function, .token.function-name, .token.builtin { color: var(--code-function); }
+.token.class-name, .token.tag, .token.property, .token.attr-name, .token.namespace { color: var(--code-type); }
+.token.variable, .token.parameter, .token.entity { color: var(--code-fg); }
+.token.bold, .token.important { font-weight: 700; }
 .token.italic { font-style: italic; }
+
+@media print {
+  .code-block pre code { white-space: pre-wrap; }
+}

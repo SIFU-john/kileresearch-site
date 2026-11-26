@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../config/site';
+---
+<BaseLayout title="Enquiry sent" description="Thanks for your enquiry." noindex>
+  <div class="container section page-prose">
+    <h1>Thanks, your enquiry has been sent</h1>
+    <p>We'll reply within {site.replyDays} working days.</p>
+    <p><a href="/research/">Read our research</a> · <a href="/">Home</a></p>
+  </div>
+</BaseLayout>

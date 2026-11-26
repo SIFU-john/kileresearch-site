@@ -8,16 +8,19 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist && node scripts/write-host-config.mjs",
+    "build": "astro build && pagefind --site dist && node --env-file-if-exists=.env scripts/write-host-config.mjs",
     "preview": "npm run serve",
     "serve": "node scripts/serve.mjs",
     "check": "astro check",
     "links": "linkinator dist --recurse --skip '^(https?://(?!(localhost|127\\.0\\.0\\.1)[:/])|mailto:)' --verbosity error",
-    "links:external": "linkinator dist --recurse --skip 'kile-research\\.example|example\\.com|^mailto:' --retry --verbosity error",
+    "links:external": "linkinator dist --recurse --skip '^mailto:|kileresearch\\.ai' --retry --verbosity error",
     "lhci": "lhci autorun",
     "fonts": "node scripts/copy-fonts.mjs",
-    "verify": "npm run check && npm run build && node scripts/verify-dist.mjs",
-    "clean": "rm -rf dist .astro node_modules/.astro"
+    "verify": "npm run check && npm test && npm run build && node scripts/verify-dist.mjs",
+    "clean": "rm -rf dist .astro node_modules/.astro",
+    "test": "node --test tests/*.test.mjs",
+    "syndicate:medium": "node --env-file-if-exists=.env scripts/syndicate-medium.mjs",
+    "headers": "node --env-file-if-exists=.env -e \"import('./config/security-headers.mjs').then(m => process.stdout.write(m.renderHeadersFile()))\""
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.10",
@@ -29,6 +32,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource-variable/source-serif-4": "5.3.1",
     "@fontsource/instrument-sans": "5.3.0",
     "@fontsource/jetbrains-mono": "5.3.0",
     "@lhci/cli": "0.16.1",

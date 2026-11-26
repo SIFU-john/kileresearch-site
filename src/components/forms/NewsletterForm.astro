@@ -1,47 +1,37 @@
 ---
-import { formConfig } from '../../lib/forms/config';
+// Buttondown newsletter (KILA-42 doc 2 §12). Buttondown's plain HTML embed form, styled with
+// our own components: no iframe, no script, email only. Without a configured username the
+// panel shows a mailto fallback instead of a form that can't work.
 import { site } from '../../config/site';
-const cfg = formConfig('newsletter');
-const id = 'nl';
+import { integrations } from '../../config/integrations';
+interface Props { idPrefix?: string; headingLevel?: 'h2' | 'h3' }
+const { idPrefix = 'nl', headingLevel = 'h2' } = Astro.props;
+const H = headingLevel;
+const nl = integrations.newsletter;
 ---
-<section class="newsletter" aria-labelledby={`${id}-title`}>
-  <h2 id={`${id}-title`}>New research in your inbox</h2>
-  <p class="muted">One email when we publish. No tracking pixels, unsubscribe any time.</p>
-  <form
-    class="nl-form"
-    data-form-kind="newsletter"
-    data-provider={cfg.provider}
-    data-endpoint={cfg.endpoint}
-    data-mailto={site.contactEmail}
-    data-mailto-subject="Newsletter sign-up"
-    method="post"
-    action={cfg.endpoint ?? ''}
-  >
-    <div class="field">
-      <label for={`${id}-email`}>Email address</label>
-      <div class="row">
-        <input class="input" id={`${id}-email`} name="email" type="email" autocomplete="email" required aria-describedby={`${id}-email-error`} />
-        <button class="btn btn-primary" type="submit">Subscribe</button>
+<section class="newsletter panel panel-subtle" aria-labelledby={`${idPrefix}-title`}>
+  <H id={`${idPrefix}-title`}>Get new research by email</H>
+  <p class="muted">New research, about once a {site.newsletterCadence}. Unsubscribe any time.</p>
+  {nl.configured ? (
+    <form class="form" method="post" action={nl.action}>
+      <input type="hidden" name="embed" value="1" />
+      <div class="field">
+        <label for={`${idPrefix}-email`}>Email address</label>
+        <div class="row">
+          <input class="input" id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" required maxlength="254" />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </div>
       </div>
-      <p class="field-error" id={`${id}-email-error`} hidden></p>
+      <p class="hint"><a href="/privacy/">Privacy notice</a></p>
+    </form>
+  ) : (
+    <div class="alert alert-info">
+      <p>Email sign-up isn't switched on yet. <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Newsletter sign-up')}`}>Email us</a> and we'll let you know when it is.</p>
+      <p class="hint"><a href="/privacy/">Privacy notice</a></p>
     </div>
-    <div class="hp" aria-hidden="true"><label>Leave empty <input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
-    <div class="alert alert-success" data-status="success" tabindex="-1" hidden><p>Thanks. Please check your inbox to confirm.</p></div>
-    <div class="alert alert-info" data-status="fallback" tabindex="-1" hidden>
-      <p>Sign-ups aren't switched on yet. <a data-mailto-link href={`mailto:${site.contactEmail}?subject=Newsletter%20sign-up`}>Email us</a> and we'll add you by hand.</p>
-    </div>
-    <div class="alert alert-danger" data-status="error" tabindex="-1" hidden>
-      <p>That didn't go through. Please try again, or <a data-mailto-link href={`mailto:${site.contactEmail}`}>email us</a>.</p>
-    </div>
-  </form>
+  )}
 </section>
-<script>
-  import '../../lib/forms/client';
-</script>
 <style>
-  .newsletter { padding: var(--space-8) var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg-subtle); }
-  .newsletter h2 { font-size: var(--text-2xl); margin-bottom: var(--space-2); }
-  .nl-form { margin-top: var(--space-5); display: grid; gap: var(--space-4); }
   .row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-  .row .input { flex: 1 1 16rem; width: auto; }
+  .row .input { flex: 1 1 14rem; width: auto; }
 </style>

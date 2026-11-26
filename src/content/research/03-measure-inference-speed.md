@@ -10,6 +10,7 @@ series:
 author: kile-research
 repoPath: scripts/benchmark.py
 readingTime: 7
+level: beginner
 draft: false
 ---
 "It feels slow" isn't something you can fix. Inference engineers use **numbers**, and two of them matter most:

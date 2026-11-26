@@ -10,6 +10,7 @@ series:
 author: kile-research
 repoPath: scripts/benchmark.py
 readingTime: 7
+level: beginner
 draft: false
 ---
 In Part 3 we found the core rule of inference speed: **every token means reading all of the model's numbers from memory.**

@@ -1,0 +1,30 @@
+---
+// Link-based filters (KILA-42 page-layouts §B3): each filter is its own URL and works without JS.
+import { seriesUrl, tagLabel, tagUrl, type Article } from '../lib/content';
+interface Props { articles: Article[]; current?: string | undefined }
+const { articles, current } = Astro.props;
+const tags = [...new Set(articles.flatMap((a) => a.data.tags))].sort();
+const series = [...new Set(articles.flatMap((a) => (a.data.series ? [a.data.series.name] : [])))];
+const check = '<svg class="check" viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8.5 3 3 7-7"/></svg>';
+const isAll = current === undefined;
+---
+<div class="filters">
+  <nav aria-label="Filter by topic">
+    <ul class="list-reset chips">
+      <li><a class="chip" href="/research/" aria-current={isAll ? 'page' : undefined}><Fragment set:html={check} />All</a></li>
+      {tags.map((t) => <li><a class="chip" href={tagUrl(t)} aria-current={current === tagUrl(t) ? 'page' : undefined}><Fragment set:html={check} />{tagLabel(t)}</a></li>)}
+    </ul>
+  </nav>
+  {series.length > 0 && (
+    <nav aria-label="Filter by series">
+      <ul class="list-reset chips">
+        {series.map((s) => <li><a class="chip" href={seriesUrl(s)} aria-current={current === seriesUrl(s) ? 'page' : undefined}><Fragment set:html={check} />{s}</a></li>)}
+      </ul>
+    </nav>
+  )}
+</div>
+<style>
+  .filters { display: grid; gap: var(--space-3); margin-top: var(--space-6); }
+  .chips { display: flex; gap: var(--space-2); overflow-x: auto; padding: var(--space-1) var(--space-1) var(--space-2); mask-image: linear-gradient(90deg, #000 90%, transparent); }
+  @media (min-width: 48rem) { .chips { flex-wrap: wrap; overflow: visible; mask-image: none; } }
+</style>

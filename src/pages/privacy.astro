@@ -1,34 +1,42 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../config/site';
-// STUB: plain-language draft. Needs review by Head of Security & Compliance (and legal)
-// before launch, and must be updated when a forms/newsletter provider and host are chosen.
+// STUB: plain-language draft based on KILA-43 `privacy-review` rev 2. Not legal advice: the
+// controller identity, jurisdiction, retention figures and the no-banner position (D1-D5)
+// must be confirmed by a lawyer or DPO before launch.
 ---
-<BaseLayout title="Privacy notice" description="How Kile Research handles your data: no cookies, no trackers, and only the details you choose to send us.">
+<BaseLayout title="Privacy notice" description="How Kile Research handles your data: no cookies, no ad tracking, and only the details you choose to send us.">
   <div class="container section">
-    <div class="prose">
-      <p class="overline">Privacy</p>
+    <div class="page-prose">
       <h1>Privacy notice</h1>
-      <p class="alert alert-info"><span>Draft: this notice is pending review and will be finalised before the site launches.</span></p>
+      <p class="muted">Draft, pending legal review. Last updated: [date on launch].</p>
       <h2>The short version</h2>
       <ul>
-        <li>We don't use cookies, analytics, advertising or tracking scripts.</li>
-        <li>We don't load fonts, scripts or images from third parties, so visiting this site doesn't tell anyone else you were here.</li>
-        <li>We only receive personal data you choose to send us, through the contact form, newsletter sign-up or email.</li>
+        <li>We don't set cookies, and we don't use advertising or cross-site tracking.</li>
+        <li>Fonts and search are served from our own site.</li>
+        <li>We only receive personal data you choose to send us: through the enquiry form, the newsletter sign-up or email.</li>
       </ul>
+      <h2>Who we are</h2>
+      <p>[Placeholder: controller name, address and country, pending Board decision D1.] Contact: <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.</p>
       <h2>What we collect and why</h2>
-      <p><strong>Contact form and email:</strong> your name, email address, company (optional) and message. We use these only to reply to you, and keep them for up to 24 months unless you ask us to delete them sooner.</p>
-      <p><strong>Newsletter:</strong> your email address, used only to send you new articles. Every email has an unsubscribe link.</p>
-      <p><strong>Server logs:</strong> our hosting provider keeps standard request logs (such as IP address, page and time) for security and troubleshooting, for a limited period.</p>
-      <h2>Who processes it</h2>
-      <p>[Placeholder: hosting provider and form/newsletter provider, with links to their privacy policies, once chosen.]</p>
+      <h3>Enquiry form</h3>
+      <p>Your name, work email, business name (optional), the service you're interested in and your message. We use them only to reply to you, before any contract (UK/EU GDPR Art. 6(1)(b)), or to answer a general question (our legitimate interest, Art. 6(1)(f)). The form sends one email to our inbox; the website itself stores nothing. Your IP address and browser details are processed briefly by Cloudflare Turnstile to check you're not a bot. We delete enquiries that don't lead to work 12 months after our last contact.</p>
+      <h3>Newsletter</h3>
+      <p>Your email address, held by our newsletter provider Buttondown, used only to send you new research, with your consent (Art. 6(1)(a)). Every email has an unsubscribe link. We keep your address until you unsubscribe.</p>
+      <h3>Analytics</h3>
+      <p>We count page views with Cloudflare Web Analytics, which Cloudflare says uses no cookies, no local storage and no fingerprinting. It gives us aggregate numbers only (pages, referrers, countries, device types and page speed). If your browser sends a Global Privacy Control signal, we don't load it at all. Our lawful basis is our legitimate interest in knowing which research is read (Art. 6(1)(f)).</p>
+      <h3>Hosting logs</h3>
+      <p>Our host, Cloudflare, processes standard request data (IP address, browser, page and time) to deliver and protect the site, for [retention period to be confirmed].</p>
+      <h3>Theme setting</h3>
+      <p>If you choose light or dark mode, your browser remembers that choice on your device. Nothing is sent to us. "Use system theme" in the footer clears it.</p>
+      <h2>Who processes your data</h2>
+      <ul>
+        <li><strong>Cloudflare</strong>: hosting, the enquiry form email, spam protection (Turnstile) and analytics.</li>
+        <li><strong>Buttondown</strong>: the newsletter.</li>
+      </ul>
+      <p>Both are based in the US. [Placeholder: transfer mechanism for each, such as the Data Privacy Framework or standard contractual clauses.]</p>
       <h2>Your rights</h2>
-      <p>You can ask to see, correct or delete the personal data we hold about you, or object to how we use it. Email <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>. You also have the right to complain to your local data protection authority.</p>
-      <p class="muted">Last updated: [date on launch].</p>
+      <p>You can ask to see, correct or delete the personal data we hold about you, or object to how we use it. Email <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>. You also have the right to complain to your data protection authority.</p>
     </div>
   </div>
 </BaseLayout>
-<style>
-  h1 { margin-block: var(--space-3) var(--space-4); }
-  .alert span { color: var(--color-text); }
-</style>

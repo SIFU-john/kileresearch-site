@@ -10,6 +10,7 @@ series:
 author: kile-research
 repoPath: scripts/count_tokens.py
 readingTime: 6
+level: beginner
 draft: false
 ---
 AI models don't read words. They read **tokens**.

@@ -1,11 +1,12 @@
 # Kile Research website
 
-The home of Kile Research: reproducible, hands-on research on AI and LLM inference, plus consulting for small and mid-sized businesses. It replaces our Medium publication.
+The home of Kile Research (`kileresearch.ai`): practical, reproducible research on AI and LLM inference, plus consulting for small businesses. It replaces our Medium publication; Medium stays as a syndication channel that links back here.
 
 - **Stack:** [Astro](https://astro.build) 7 static site, TypeScript, Markdown/MDX content collections with a typed schema
-- **Search:** [Pagefind](https://pagefind.app), built at compile time and fully self-hosted
-- **JavaScript shipped:** none on most pages. Small bundled modules only for code-copy buttons, search and forms
-- **Security:** no inline scripts or styles, strict CSP and security headers from one config file, self-hosted fonts, no trackers or third-party requests
+- **Hosting:** Cloudflare Pages (static files + one Pages Function for the enquiry form). Setup: [docs/cloudflare-pages.md](docs/cloudflare-pages.md)
+- **Search:** [Pagefind](https://pagefind.app), built at compile time, fully self-hosted
+- **Design:** KILA-32 "Calm Signal" tokens + KILA-42 Kile Research tokens, light and dark themes
+- **Security:** no inline scripts or styles, strict CSP generated from one config file, self-hosted fonts, no trackers, no cookies
 
 ---
 
@@ -13,8 +14,8 @@ The home of Kile Research: reproducible, hands-on research on AI and LLM inferen
 
 You only need a GitHub account with access to this repository. Everything happens in the browser.
 
-1. **Start from the template.** Open [`src/content/research/`](src/content/research/) on GitHub, then click **Add file → Create new file**.
-2. **Name the file** `NN-short-name.md`, for example `05-memory-bandwidth.md`. Use the part number, lowercase letters and hyphens. The file name becomes the web address: `/research/05-memory-bandwidth/`.
+1. **Start a new file.** Open [`src/content/research/`](src/content/research/) on GitHub, then click **Add file → Create new file**.
+2. **Name the file** `NN-short-name.md`, for example `05-memory-bandwidth.md`: lowercase letters and hyphens. The file name becomes the web address: `kileresearch.ai/research/05-memory-bandwidth/`.
 3. **Paste this header at the very top** and fill it in:
 
    ```markdown
@@ -28,143 +29,135 @@ You only need a GitHub account with access to this repository. Everything happen
      week: 2
      part: 5
    author: kile-research
+   level: beginner
    repoPath: scripts/memory_bandwidth.py
-   readingTime: 7
    draft: false
    ---
    ```
 
    - `tags`: 1–6 tags, lowercase, words joined with hyphens (`local-llm`, not `Local LLM`).
-   - `repoPath`: the file or folder in the [KileResearch code repo](https://github.com/SIFU-john/KileResearch) that readers can run. It powers the **Reproduce this** button. Leave the line out if there is no code.
-   - `readingTime` (optional): minutes, including following the steps. If you leave it out, it's estimated.
+   - `level`: `beginner` or `intermediate` (optional).
+   - `repoPath`: the file or folder in the [KileResearch code repo](https://github.com/SIFU-john/KileResearch) readers can run. It powers **Reproduce this**. Leave it out if there's no code.
+   - `tested` (optional, only real values): a "Tested with" list, e.g. `tested: [{ label: "Hardware", value: "M2 MacBook Air, 16 GB" }]`.
+   - `readingTime` (optional): minutes. If you leave it out it's worked out for you.
    - `updated: 2026-12-01` (optional): add this when you correct a published article.
-   - `draft: true` keeps the article off the live site while you work on it.
+   - `mediumUrl` (optional): the Medium copy's URL, once syndicated. It adds a small "Also on Medium" link.
+   - `draft: true` keeps the article off the live site, RSS, sitemap and search while you work on it.
 
-4. **Write the article below the second `---`** in normal Markdown, following [STYLE.md](https://github.com/SIFU-john/KileResearch/blob/main/STYLE.md). **Don't** repeat the title or the byline: the page adds those for you. Start with your opening paragraph.
-   - Links to other articles can use either form: `[Part 1](01-run-your-first-llm-locally.md)` or `[Part 1](/research/01-run-your-first-llm-locally/)`.
-   - **Images:** upload them to `src/content/research/images/` and use `![Describe the image for screen readers](./images/my-chart.png)`. Alt text is required. Images are resized and compressed automatically. Unlike Medium, tables work as normal Markdown tables, so you don't need table images.
-5. **Open a pull request.** At the bottom of the page choose **Create a new branch … and start a pull request**, then click **Propose new file** and **Create pull request**.
-6. **Wait for the green ticks.** CI checks the header fields, builds the site, checks every link and runs Lighthouse. If something is red, open **Details**: the error names the file and the field to fix (for example, *description: must be at least 50 characters*).
-7. **Ask for a review, then merge.** Once it's approved, click **Merge pull request**. The site rebuilds from `main`.
+4. **Write the article below the second `---`** in normal Markdown, following [STYLE.md](https://github.com/SIFU-john/KileResearch/blob/main/STYLE.md). Don't repeat the title or byline; start with your opening paragraph.
+   - Links to other articles: `[Part 1](01-run-your-first-llm-locally.md)` or `[Part 1](/research/01-run-your-first-llm-locally/)`.
+   - **Callouts:** start a quote with a bold label: `> **Tip:** ...`, `> **Note:** ...`, `> **Heads-up:** ...` (warning) or `> **Caution:** ...`. GitHub style `> [!TIP]` works too.
+   - **Images:** upload to `src/content/research/images/` and write `![Describe the image](./images/my-chart.png "Figure 1. Optional caption")`. Alt text is required. Tables work as normal Markdown tables.
+5. **Open a pull request.** Choose **Create a new branch … and start a pull request**, then **Propose new file** and **Create pull request**.
+6. **Wait for the green ticks.** CI checks the header fields, builds the site, checks links, scans for secrets and runs Lighthouse. If something is red, open **Details**: the error names the file and field (e.g. *description: must be at least 50 characters*).
+7. **Ask for a review, then merge.** Once Cloudflare Pages is connected, merging to `main` deploys automatically; every pull request also gets its own private preview link.
 
-> **Deployment status:** hosting isn't connected yet (it needs CEO/Board approval for a domain and an AWS account). Until then, merging updates `main` and CI produces a ready-to-upload build artifact; it doesn't go live automatically. See [Deploying](#deploying).
+> **Deployment status:** not live. The Cloudflare account, project and domain need a named human and user approval (see [docs/cloudflare-pages.md](docs/cloudflare-pages.md)). Until then, CI produces a ready-to-deploy `dist` artifact.
 
-To see your article before publishing, ask an engineer for a preview, or run the site locally (below).
+### Syndicate to Medium
+
+Our site is always the original; Medium copies point their canonical link back here.
+
+- **Once the site is live (preferred):** on Medium, go to *Import a story* (`medium.com/p/import`) and paste the article URL, e.g. `https://kileresearch.ai/research/03-measure-inference-speed/`. Medium imports it and sets the canonical link for you.
+- **Before that, or if the import mangles code:** run `npm run build && npm run syndicate:medium` (or `... -- 03-measure-inference-speed` for one article). Open `syndication/medium/<slug>.html` in a browser, copy the article into a new Medium story, then set **Story settings → Advanced settings → "This story was originally published elsewhere"** to the canonical URL shown at the top of the file. The export makes links absolute, turns tables into monospaced text (Medium has no tables) and adds "Originally published at kileresearch.ai, with code to reproduce it."
+- Then add `mediumUrl:` to the article's header so our page shows "Also on Medium".
 
 ---
 
 ## Run it locally
 
-Requirements: Node.js 22.23.4+ (24 recommended, see `.nvmrc`) and npm.
+Requirements: Node.js 24 (see `.nvmrc`) and npm.
 
 ```bash
 npm ci                 # install exact versions from the lockfile
 npm run dev            # http://localhost:4321, live reload, drafts visible
-npm run build          # production build into dist/ (+ search index + header files)
-npm run serve          # serve dist/ with the real security headers on http://localhost:4322
+npm run build          # production build into dist/ (+ search index, _headers, security.txt)
+npm run preview        # serve dist/ like Cloudflare Pages would, with dist/_headers, on http://localhost:4322
 ```
+
+`npm run preview` applies `dist/_headers` exactly (including `! Header` detach rules) and answers `POST /api/contact` like the *unconfigured* Function (303 → `/contact/unavailable/`). To run the real Function locally: `npx wrangler pages dev dist` (needs a `.dev.vars` file with the server-side variables).
 
 Quality checks (the same ones CI runs):
 
 ```bash
 npm run check                    # TypeScript + content schema validation
-node scripts/verify-dist.mjs     # no inline JS/CSS, no third-party assets, articles fully rendered
+npm test                         # contact Function + security header tests (node:test)
+node scripts/verify-dist.mjs     # no inline JS/CSS, no third-party assets, no drafts leaked, articles fully rendered
 npm run links                    # internal link check
-npm run links:external           # external links too (network needed)
-npx lhci autorun --config=lighthouserc.mobile.cjs   # Lighthouse, mobile (asserts ≥95 everywhere)
+npx lhci autorun --config=lighthouserc.mobile.cjs   # Lighthouse, mobile (asserts ≥95 everywhere, LCP < 2.5 s)
 npx lhci autorun --config=lighthouserc.cjs          # Lighthouse, desktop
+npm run headers                  # print the _headers file for the current env
 ```
 
-`SHOW_DRAFTS=1 npm run build` includes drafts, such as `zz-kitchen-sink.md`, a fixture that shows every element an article can use (headings, code, tables, images, callouts).
-
-If you change a Markdown plugin and the output doesn't change, run `npm run clean`: Astro caches rendered content.
+`SHOW_DRAFTS=1 npm run build` includes drafts, such as `zz-kitchen-sink.md`, a fixture with every element an article can use. If Markdown output doesn't change after editing a plugin, run `npm run clean`.
 
 ### Configuration
 
-Copy `.env.example` to `.env` to override settings. Never commit `.env`.
+Copy `.env.example` to `.env` locally; in Cloudflare Pages set the same names under **Settings → Variables and Secrets**. Anything unset is switched off and its origin stays out of the CSP.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `SITE_URL` | `https://kile-research.example` | Canonical origin for links, sitemap, RSS and OpenGraph. **Placeholder until a domain is approved.** |
-| `PUBLIC_CONTACT_EMAIL` | `hello@example.com` | mailto fallback address. **Placeholder.** |
-| `PUBLIC_FORMS_PROVIDER` | `none` | `none` or `http-post` |
-| `PUBLIC_CONTACT_ENDPOINT` / `PUBLIC_NEWSLETTER_ENDPOINT` | empty | Where `http-post` sends JSON. Their origins are added to the CSP automatically. |
+| `SITE_URL` | `https://kileresearch.ai` | Canonical origin: canonical, Open Graph, RSS, sitemap, JSON-LD and security.txt all derive from it |
+| `PUBLIC_CONTACT_EMAIL` | `hello@kileresearch.ai` | mailto fallback. **Stub** until email is set up on the domain |
+| `PUBLIC_BUTTONDOWN_USERNAME` | unset | Buttondown newsletter. Unset → panels show a mailto fallback |
+| `PUBLIC_BUTTONDOWN_HOST` | `https://buttondown.com` | Host of the embed form action. Copy it from Buttondown's embed code |
+| `PUBLIC_CONTACT_PROVIDER` | `pages-function` | `pages-function`, `formspree` (+ `PUBLIC_FORMSPREE_FORM_ID`) or `none` |
+| `PUBLIC_TURNSTILE_SITE_KEY` | unset | Turnstile on the enquiry form (contact + consulting pages only) |
+| `PUBLIC_CF_ANALYTICS_TOKEN` | unset | Cloudflare Web Analytics, loaded by `/js/analytics.js`, skipped when the browser sends GPC |
+| `CSP_MODE` | `enforce` | `report-only` sends `Content-Security-Policy-Report-Only` (use on previews first) |
+| `PUBLIC_MEDIUM_PROFILE` | unset | Adds "Also on Medium" to the footer |
+
+Server-side variables for the Function (`TURNSTILE_SECRET`, `ALLOWED_ORIGINS`, `CONTACT_FROM`, `CONTACT_TO`, `CONTACT_EMAIL` binding) are in [docs/cloudflare-pages.md](docs/cloudflare-pages.md). Never prefix a secret with `PUBLIC_`: those are baked into the HTML.
 
 ---
 
 ## How it's built
 
 ```
-src/
-  content/research/      articles (Markdown/MDX) + images/
-  content.config.ts      typed frontmatter schema (build fails on invalid fields)
-  config/site.ts         name, nav, code repo, contact email
-  config/authors.ts      author profiles (house style: "Kile Research" only)
-  styles/tokens.css      KILA-32 design tokens, copied verbatim. Swap the file to update the design
-  styles/global.css      site layer: dark mode, buttons, cards, forms, prose, tables
-  styles/code.css        Prism syntax colours (AA contrast)
-  components/            Header, Footer, ArticleCard, Toc, AuthorBox, ReproduceLink, Search, forms/…
-  layouts/BaseLayout     <head>: SEO, canonical, OpenGraph, JSON-LD, RSS
-  lib/forms/             provider-agnostic form adapter
-  lib/rehype-article.mjs table/code wrappers, heading anchors, .md link rewriting
-  lib/og.ts              build-time OpenGraph PNGs (satori + resvg)
-  pages/                 /, /research/, /research/[slug]/, /research/tags/*, /research/series/*,
-                         /consulting/, /about/, /contact/, /privacy/, 404, rss.xml, robots.txt, og/*.png
-config/security-headers.mjs   single source of truth for CSP and security headers
-scripts/                      serve, verify-dist, write-host-config, copy-fonts, migrate-articles
-infra/                        generated CloudFront response-headers policy
+config/security-headers.mjs   single source of truth for headers/CSP -> dist/_headers
+config/integrations.mjs       env -> which integrations are on (shared by Astro and Node scripts)
+functions/api/contact.js      Pages Function: enquiry form -> Turnstile -> email (Email Routing)
+public/theme.js               theme preference (reads localStorage; writes only on click)
+public/js/analytics.js        GPC-aware Cloudflare Web Analytics loader
+src/content/research/         articles (Markdown/MDX) + images
+src/content.config.ts         typed frontmatter schema
+src/config/                   site, services, authors, fonts, content flags
+src/styles/                   tokens.css (KILA-32), kile-research.tokens.css (KILA-42), site CSS
+src/lib/rehype-article.mjs    code blocks, tables, callouts, figures, heading anchors, link rewriting
+scripts/                      host config, local server, dist checks, fonts, Medium export
+tests/                        node:test suites
 ```
 
-### Design tokens
-
-`src/styles/tokens.css` is the KILA-32 "Calm Signal" token file, unchanged. Components only use semantic tokens (`--color-text`, `--color-accent`, …), so Iris's KILA-42 article and consulting layouts can drop in by replacing the token file and the component styles. Dark mode follows the OS setting (`prefers-color-scheme`) using the tested ink-surface values, with no JS and no flash. The italic font face lives in `global.css` because tokens v0.1 doesn't define one.
-
-### Forms and newsletter
-
-Pages only talk to the `FormAdapter` interface in `src/lib/forms/types.ts`. Adapters live in `src/lib/forms/adapters.ts`:
-
-- `none` (default): every submit returns `not-configured`. The form shows a friendly notice with a **pre-filled mailto link**, so nothing is lost.
-- `http-post`: sends JSON to the configured endpoint. This works with most hosted form services or a small serverless function of our own.
-
-To add a provider with a custom API, write a new adapter (about 20 lines), register it in `adapters`, and set `PUBLIC_FORMS_PROVIDER`. Forms include client-side validation with accessible error messages, a honeypot field for bots, and `credentials: 'omit'`.
+- **Design tokens:** `src/styles/tokens.css` and `src/styles/kile-research.tokens.css` are copies of the design files with only `@font-face` removed (fonts are declared in `fonts.css` with versioned file names). Update by re-copying.
+- **Syntax highlighting:** Prism (class names only). Shiki, including its `css-variables` theme, writes `style=""` on every token, which the CSP forbids. Prism classes map to the same `--code-*` tokens as the design's Shiki bridge.
+- **Fonts:** Instrument Sans, Source Serif 4 and JetBrains Mono, WOFF2, self-hosted in `public/fonts/` with their OFL licences. File names carry the package version because `/fonts/*` is cached immutably. `npm run fonts` regenerates them.
+- **Forms:** plain HTML POSTs that work without JavaScript. The enquiry form posts to `/api/contact`; JS adds validation, an error summary and an in-page result. The newsletter is Buttondown's embed form (no iframe, no script).
+- **Content flags:** consulting claims that need a business decision are behind `contentFlags` in `src/config/site.ts`.
 
 ### Security headers
 
-`config/security-headers.mjs` defines every header once. `npm run build` writes:
-
-- `dist/_headers` for Netlify or Cloudflare Pages
-- `infra/cloudfront-response-headers-policy.json` for AWS CloudFront, our default (`aws cloudfront create-response-headers-policy --response-headers-policy-config file://infra/cloudfront-response-headers-policy.json`)
-
-`npm run serve` and Lighthouse CI apply the same headers, so CSP breakage shows up locally and in CI.
-
-Policy summary: `default-src 'none'`; scripts, styles, fonts and images from `'self'` only; `frame-ancestors 'none'`; `base-uri 'none'`; `object-src 'none'`; HSTS (2 years, preload); `nosniff`; `strict-origin-when-cross-origin`; a locked-down Permissions-Policy; COOP and CORP `same-origin`.
-
-Exceptions, both deliberate:
-- `script-src 'wasm-unsafe-eval'` is needed for Pagefind's WebAssembly search. It permits WebAssembly compilation only, not JavaScript `eval`.
-- JSON-LD uses `<script type="application/ld+json">`. It's a non-executable data block, so CSP doesn't apply to it, and `<` is escaped.
-
-Prism is used for syntax highlighting instead of Shiki because Shiki writes inline `style=""` attributes, which `style-src 'self'` would block.
+`config/security-headers.mjs` generates `dist/_headers` on every build (KILA-43 `security-headers-csp` rev 3): CSP, nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options, COOP/CORP, cache rules, and `X-Robots-Tag: noindex` for `*.pages.dev`. Turnstile's origins are allowed only on `/contact/*` and `/consulting/*`, using `! Content-Security-Policy` to detach the site-wide policy. **HSTS is deliberately not in `_headers`**: it is set once in the Cloudflare dashboard with a staged ramp.
 
 ### CI (`.github/workflows/ci.yml`)
 
-On every PR and on push to `main`: `npm ci --ignore-scripts`, `npm audit` (runtime dependencies must be clean; dev tooling is reported), `astro check`, build, `verify-dist`, internal link check, Lighthouse CI (mobile and desktop, ≥ 95 in every category, LCP < 2.5 s, CLS < 0.1), and a gitleaks secret scan. External links are checked on `main` without blocking. Actions are pinned to commit SHAs, and dependencies are pinned exactly (`.npmrc save-exact`). Dependabot keeps both up to date.
+Build, type-check, unit tests, `npm audit --omit=dev --audit-level=high` (fails the build), verify-dist, internal links, gitleaks on the repo and on `dist/`, and Lighthouse CI (mobile + desktop, ≥95 in every category). Actions are pinned to commit SHAs, the workflow token is `contents: read`, and Dependabot watches npm and Actions.
 
 ---
 
-## Deploying
+## Stubs and open items
 
-**Not set up yet, on purpose.** Deploying to a public domain, buying a domain and creating hosting accounts all need CEO/Board approval. The intended setup on our default stack:
-
-1. S3 bucket (private, Origin Access Control) + CloudFront, with the generated response-headers policy attached.
-2. A GitHub Actions deploy job on `main` using OIDC to assume a least-privilege role (`s3:PutObject`/`DeleteObject` on the bucket and `cloudfront:CreateInvalidation`). No long-lived keys.
-3. PR previews on a separate, `noindex` preview distribution.
-
-`dist/` is a plain static folder, so Netlify or Cloudflare Pages also work (they read `dist/_headers`).
-
-## Content migration
-
-The four Week 1 articles were migrated from [SIFU-john/KileResearch](https://github.com/SIFU-john/KileResearch) with `node scripts/migrate-articles.mjs <checkout>`. It moves the title, byline, series, part and reading time into frontmatter, then drops the H1 and byline from the body. Publication dates were **inferred** from the hub README's Mon/Tue/Thu/Fri cadence (2, 3, 5 and 6 November 2026) and should be confirmed.
+| Item | Status | Owner |
+|---|---|---|
+| Consulting copy, FAQ answers, "How it works" durations, reply time `[n]` | Placeholder | Chris (copy), CEO |
+| Prices | "Price on request — pending Board approval" | Board |
+| "Your data stays yours…", "Fixed-scope projects or month-to-month…" | Hidden behind `contentFlags` | CEO |
+| Newsletter cadence `[week/month]`, double opt-in wording | Placeholder | Account owner |
+| `hello@` / `security@kileresearch.ai` | Not set up yet | Board (email layout, KILA-43) |
+| Privacy notice, accessibility statement | Drafts, need legal review / Gate A results | Sentinel, lawyer, Iris |
+| Author bio and links | Placeholder | Author |
+| Logo mark, favicon | Draft artwork (KILA-42) | Iris |
+| Cloudflare project, domain, Buttondown, Turnstile, Email Routing | Not created (needs user approval) | Named human |
 
 ## License
 
-Code and content: MIT, © 2026 Kile Research. Fonts: Instrument Sans and JetBrains Mono, SIL Open Font License 1.1 (see `public/fonts/`).
+To be confirmed by the Board. Article text and code: see the [KileResearch repo](https://github.com/SIFU-john/KileResearch).

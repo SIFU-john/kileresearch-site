@@ -1,14 +1,15 @@
 ---
+// KILA-42 doc 2 §11. The bio comes from the author (src/config/authors.ts). No invented credentials.
 import { authors } from '../config/authors';
 interface Props { id: keyof typeof authors }
 const a = authors[Astro.props.id];
 ---
-<aside class="author card" aria-label="About the author">
-  <p class="overline">Written by</p>
-  <p class="name"><a href={a.url}>{a.name}</a></p>
-  <p class="muted">{a.bio}</p>
-</aside>
-<style>
-  .name { font-weight: var(--weight-semibold); font-size: var(--text-lg); }
-  .author:hover { box-shadow: var(--shadow-1); border-color: var(--color-border); }
-</style>
+<section class="author-box" aria-labelledby="author-title">
+  <div>
+    <h2 id="author-title">About the author</h2>
+    <p class="name">{a.name}</p>
+    <p class="muted">{a.role}</p>
+    <p>{a.bio}</p>
+    <p class="links">{a.links.map((l) => <a href={l.href}>{l.label}{/^https?:/.test(l.href) && <span class="visually-hidden"> (opens external site)</span>}</a>)}</p>
+  </div>
+</section>

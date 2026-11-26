@@ -1,25 +1,31 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import ArticleRow from '../../components/ArticleRow.astro';
 import Search from '../../components/Search.astro';
-import TagFilter from '../../components/TagFilter.astro';
+import FilterNav from '../../components/FilterNav.astro';
+import NewsletterForm from '../../components/forms/NewsletterForm.astro';
 import { getArticles } from '../../lib/content';
 const articles = await getArticles();
 ---
-<BaseLayout title="Research" description="Every Kile Research article: hands-on, reproducible guides to AI and LLM inference for beginner to intermediate readers.">
+<BaseLayout title="Research" description="Every Kile Research article, newest first: plain-language, reproducible write-ups on AI and LLM inference, with code you can run.">
   <div class="container section">
-    <header class="stack head">
-      <p class="overline">Research</p>
-      <h1>All research</h1>
-      <p class="lead">Hands-on guides that teach one idea at a time. Every number was measured, and the code is public.</p>
+    <header class="head">
+      <h1>Research</h1>
+      <p class="lead">All our write-ups, newest first.</p>
+      <p class="muted count">{articles.length} articles · <a href="/rss.xml">Subscribe via RSS</a></p>
     </header>
     <Search />
-    <TagFilter articles={articles} />
-    <h2 class="visually-hidden">Articles</h2>
-    <div class="grid list">{articles.map((a) => <ArticleCard article={a} />)}</div>
+    <FilterNav articles={articles} />
+    <div data-article-list>
+      <h2 class="visually-hidden">Articles</h2>
+      <ol class="list-reset list" reversed>{articles.map((a) => <li><ArticleRow article={a} /></li>)}</ol>
+    </div>
   </div>
+  <div class="container nl"><NewsletterForm /></div>
 </BaseLayout>
 <style>
-  .head { margin-bottom: var(--space-8); }
-  .list { margin-top: var(--space-8); }
+  .head { display: grid; gap: var(--space-3); }
+  .count { font-size: var(--text-sm); }
+  .list { margin-top: var(--space-6); border-top: 1px solid var(--color-rule); max-width: 52rem; }
+  .nl { max-width: 40rem; }
 </style>

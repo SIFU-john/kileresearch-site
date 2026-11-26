@@ -1,0 +1,181 @@
+/* Copied from KILA-42 kile-research-design/kile-research.tokens.css. Only change: @font-face rules removed, because fonts are declared in
+   fonts.css with versioned file names (/fonts/* is cached immutably). Edit upstream, then re-copy. */
+/* Kile Research tokens v0.1 — layer on top of KILA-32 tokens.css ("Calm Signal").
+   Load order: tokens.css -> kile-research.tokens.css -> site CSS.
+   Every text pairing below is WCAG 2.2 AA checked; ratios in comments (fg on bg).
+   Fonts are self-hosted from /fonts/ (font-src 'self'); no font CDNs. */
+
+/* Reading serif: Source Serif 4 (SIL OFL 1.1). Subset Latin + Latin Ext. Preload the roman file on article pages only. */
+:root {
+  color-scheme: light;
+
+  /* --- New primitives --- */
+  --paper:#FAF9F6;        /* warm reading surface (borrowed from Concept B warmth) */
+  --code-surface-light:#F2F3F5;
+  --ink-550:#55627A;      /* 5.84:1 on paper — captions/meta when ink-500 feels too light */
+  --magenta-700:#A1286A;  /* 6.25:1 on code-surface-light — syntax keywords only */
+  --magenta-200:#F0A3D0;  /* 8.66:1 on ink-900 — syntax keywords, dark */
+  --ink-150:#B4BDCF;      /* 8.87:1 on ink-900 — dark code punctuation */
+
+  /* --- Type: long-form --- */
+  --font-serif:"Source Serif 4", "Iowan Old Style", "Charter", Georgia, serif;
+  --font-reading:var(--font-serif);       /* swap to var(--font-sans) to drop the serif */
+  --text-read:clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem);  /* 17px -> 19px */
+  --text-read-sm:0.9375rem;               /* captions, footnotes, table cells: 15px */
+  --text-code:0.9375rem;                  /* code blocks: 15px */
+  --text-code-inline:0.875em;             /* relative to surrounding text */
+  --text-article-h1:clamp(2rem, 1.5rem + 2.2vw, 3rem);
+  --text-article-h2:clamp(1.5rem, 1.3rem + 0.8vw, 1.875rem);
+  --text-article-h3:clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem);
+  --text-article-h4:var(--text-read);
+  --text-lede:clamp(1.1875rem, 1.1rem + 0.5vw, 1.375rem);
+  --leading-read:1.7;
+  --leading-code:1.6;
+  --leading-heading:1.2;
+  --flow-space:1.25em;                    /* space between paragraphs */
+  --flow-space-heading:2.4em;             /* space above h2 */
+
+  /* --- Layout: reading --- */
+  --measure-read:68ch;                    /* allowed range 60–75ch; never wider */
+  --measure-wide:min(52rem, 100%);        /* code, tables, figures may break out to this */
+  --rail-toc:15rem;
+  --header-height:4.5rem;
+  --scroll-offset:calc(var(--header-height) + 1rem);
+  --progress-height:3px;
+
+  /* --- Semantic: light reading (default) --- */
+  --color-page:var(--paper);
+  --color-read-text:var(--ink-900);       /* 15.91:1 on paper */
+  --color-read-heading:var(--ink-950);    /* 17.78:1 on paper */
+  --color-read-muted:var(--ink-550);      /* 5.84:1 on paper */
+  --color-rule:var(--ink-200);            /* decorative */
+  --color-mark-bg:var(--signal-50);
+  --color-selection:rgb(14 111 102 / 0.18);
+
+  --code-bg:var(--code-surface-light);
+  --code-border:var(--ink-200);
+  --code-fg:var(--ink-900);               /* 15.09:1 */
+  --code-comment:var(--ink-500);          /* 5.12:1, also italic */
+  --code-keyword:var(--magenta-700);      /* 6.25:1 */
+  --code-string:var(--green-700);         /* 5.88:1 */
+  --code-number:var(--amber-700);         /* 6.13:1 */
+  --code-function:var(--blue-700);        /* 5.98:1 */
+  --code-type:var(--signal-700);          /* 5.43:1 */
+  --code-punctuation:var(--ink-600);      /* 8.02:1 */
+  --code-line-highlight:rgb(14 111 102 / 0.10);
+  --code-inline-bg:var(--code-surface-light);
+
+  --callout-note-bg:var(--blue-50);   --callout-note-accent:var(--blue-700);      /* label 6.03:1 */
+  --callout-tip-bg:var(--signal-50);  --callout-tip-accent:var(--signal-700);     /* label 5.41:1 */
+  --callout-warn-bg:var(--amber-50);  --callout-warn-accent:var(--amber-700);     /* label 6.39:1 */
+  --callout-danger-bg:var(--red-50);  --callout-danger-accent:var(--red-700);     /* label 6.05:1 */
+  /* callout body text = --color-read-text: >= 15:1 on every callout bg */
+
+  --table-stripe:var(--ink-50);
+  --table-head-bg:var(--code-surface-light);
+}
+
+/* --- Dark mode ---
+   Applied when the user chose dark (data-theme="dark" on <html>), or when the OS asks for dark
+   and the user hasn't chosen light. Keep the two blocks identical. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg:var(--ink-950); --color-bg-subtle:var(--ink-900); --color-bg-accent:var(--ink-800);
+  --color-text:var(--ink-200); --color-text-muted:var(--ink-300); --color-text-strong:var(--ink-50);
+  --color-accent:var(--signal-400); --color-accent-hover:var(--signal-300); --color-on-accent:var(--ink-950);
+  --color-link:var(--signal-300); --color-link-hover:var(--white);
+  --color-border:var(--ink-800); --color-border-input:var(--ink-350); --color-border-strong:var(--ink-300);
+  --color-focus:var(--signal-300); --color-focus-inner:var(--ink-950);
+  --color-disabled-bg:var(--ink-800); --color-disabled-text:var(--ink-300);
+  --color-danger:var(--red-300); --color-danger-hover:var(--red-200); --color-on-danger:var(--ink-950); --color-danger-bg:var(--ink-900);
+  --color-success:var(--green-300); --color-success-bg:var(--ink-900);
+  --color-warning:var(--amber-300); --color-warning-bg:var(--ink-900);
+  --color-info:var(--blue-300); --color-info-bg:var(--ink-900);
+
+  --color-page:var(--ink-950);
+  --color-read-text:var(--ink-200);       /* 13.34:1 — softer than white to reduce halation */
+  --color-read-heading:var(--ink-50);     /* 17.47:1 */
+  --color-read-muted:var(--ink-300);      /* 8.39:1 */
+  --color-rule:var(--ink-800);
+  --color-mark-bg:var(--ink-800);
+  --color-selection:rgb(94 234 212 / 0.25);
+
+  --code-bg:var(--ink-900); --code-border:var(--ink-800);
+  --code-fg:var(--ink-200);               /* 11.94:1 */
+  --code-comment:var(--ink-300);          /* 7.51:1 */
+  --code-keyword:var(--magenta-200);      /* 8.66:1 */
+  --code-string:var(--green-300);         /* 9.62:1 */
+  --code-number:var(--amber-300);         /* 10.04:1 */
+  --code-function:var(--blue-300);        /* 8.15:1 */
+  --code-type:var(--signal-300);          /* 11.33:1 */
+  --code-punctuation:var(--ink-150);      /* 8.87:1 */
+  --code-line-highlight:rgb(94 234 212 / 0.10);
+  --code-inline-bg:var(--ink-900);
+
+  --callout-note-bg:var(--ink-900);   --callout-note-accent:var(--blue-300);
+  --callout-tip-bg:var(--ink-900);    --callout-tip-accent:var(--signal-300);
+  --callout-warn-bg:var(--ink-900);   --callout-warn-accent:var(--amber-300);
+  --callout-danger-bg:var(--ink-900); --callout-danger-accent:var(--red-300);
+
+  --table-stripe:var(--ink-900);
+  --table-head-bg:var(--ink-900);
+  --shadow-1:none; --shadow-2:0 0 0 1px var(--ink-800); --shadow-3:0 0 0 1px var(--ink-600);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg:var(--ink-950); --color-bg-subtle:var(--ink-900); --color-bg-accent:var(--ink-800);
+    --color-text:var(--ink-200); --color-text-muted:var(--ink-300); --color-text-strong:var(--ink-50);
+    --color-accent:var(--signal-400); --color-accent-hover:var(--signal-300); --color-on-accent:var(--ink-950);
+    --color-link:var(--signal-300); --color-link-hover:var(--white);
+    --color-border:var(--ink-800); --color-border-input:var(--ink-350); --color-border-strong:var(--ink-300);
+    --color-focus:var(--signal-300); --color-focus-inner:var(--ink-950);
+    --color-disabled-bg:var(--ink-800); --color-disabled-text:var(--ink-300);
+    --color-danger:var(--red-300); --color-danger-hover:var(--red-200); --color-on-danger:var(--ink-950); --color-danger-bg:var(--ink-900);
+    --color-success:var(--green-300); --color-success-bg:var(--ink-900);
+    --color-warning:var(--amber-300); --color-warning-bg:var(--ink-900);
+    --color-info:var(--blue-300); --color-info-bg:var(--ink-900);
+    --color-page:var(--ink-950); --color-read-text:var(--ink-200); --color-read-heading:var(--ink-50);
+    --color-read-muted:var(--ink-300); --color-rule:var(--ink-800); --color-mark-bg:var(--ink-800);
+    --color-selection:rgb(94 234 212 / 0.25);
+    --code-bg:var(--ink-900); --code-border:var(--ink-800); --code-fg:var(--ink-200); --code-comment:var(--ink-300);
+    --code-keyword:var(--magenta-200); --code-string:var(--green-300); --code-number:var(--amber-300);
+    --code-function:var(--blue-300); --code-type:var(--signal-300); --code-punctuation:var(--ink-150);
+    --code-line-highlight:rgb(94 234 212 / 0.10); --code-inline-bg:var(--ink-900);
+    --callout-note-bg:var(--ink-900); --callout-note-accent:var(--blue-300);
+    --callout-tip-bg:var(--ink-900); --callout-tip-accent:var(--signal-300);
+    --callout-warn-bg:var(--ink-900); --callout-warn-accent:var(--amber-300);
+    --callout-danger-bg:var(--ink-900); --callout-danger-accent:var(--red-300);
+    --table-stripe:var(--ink-900); --table-head-bg:var(--ink-900);
+    --shadow-1:none; --shadow-2:0 0 0 1px var(--ink-800); --shadow-3:0 0 0 1px var(--ink-600);
+  }
+}
+
+/* Ink bands (consulting teaser, footer) must still read as a distinct band in dark mode. */
+:root[data-theme="dark"] [data-surface="ink"] { --color-bg:var(--ink-900); --color-bg-subtle:var(--ink-800); border-block:1px solid var(--ink-800); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-surface="ink"] { --color-bg:var(--ink-900); --color-bg-subtle:var(--ink-800); border-block:1px solid var(--ink-800); }
+}
+
+/* Astro/Shiki bridge: set markdown.shikiConfig.theme = "css-variables".
+   Confirm variable names against the installed Astro version (Astro 5 uses --astro-code-foreground / --astro-code-background). */
+:root {
+  --astro-code-foreground:var(--code-fg);
+  --astro-code-background:var(--code-bg);
+  --astro-code-token-comment:var(--code-comment);
+  --astro-code-token-keyword:var(--code-keyword);
+  --astro-code-token-string:var(--code-string);
+  --astro-code-token-string-expression:var(--code-string);
+  --astro-code-token-constant:var(--code-number);
+  --astro-code-token-function:var(--code-function);
+  --astro-code-token-parameter:var(--code-fg);
+  --astro-code-token-punctuation:var(--code-punctuation);
+  --astro-code-token-link:var(--color-link);
+}
+
+::selection { background:var(--color-selection); }
+html { scroll-padding-top:var(--scroll-offset); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --progress-height:0px; } /* hide the scroll progress bar */
+}

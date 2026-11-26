@@ -1,24 +1,34 @@
 ---
-// Client-side search over the Pagefind index (generated at build into /pagefind/).
-// Uses the Pagefind JS API with our own markup, so styling follows the tokens and
-// nothing injects inline styles.
+// Pagefind search (self-hosted index in /pagefind/, no third-party requests), rendered with
+// our own markup so nothing injects inline styles. Hidden without JS: the list below it
+// still works. KILA-42 page-layouts §B2.
 ---
-<search class="search" aria-label="Search research">
+<search class="search" id="search-region" hidden data-search>
   <form class="search-form" role="search" action="/research/" method="get">
-    <label for="q" class="visually-hidden">Search articles</label>
-    <input class="input" id="q" name="q" type="search" placeholder="Search articles, e.g. quantization" autocomplete="off" />
+    <label for="search">Search research</label>
+    <div class="row">
+      <input class="input" id="search" name="q" type="search" autocomplete="off" spellcheck="false" />
+      <button class="btn btn-secondary" type="submit">Search</button>
+    </div>
   </form>
-  <p class="muted status" id="search-status" aria-live="polite"></p>
-  <ol class="results" id="search-results"></ol>
+  <p class="status" id="search-status" role="status" aria-live="polite" tabindex="-1"></p>
+  <div class="empty" hidden data-search-empty>
+    <button class="btn btn-secondary" type="button" data-search-clear>Clear search</button>
+    <a href="/research/">All research</a>
+  </div>
+  <ol class="results list-reset" id="search-results"></ol>
 </search>
 
 <script>
   type Hit = { url: string; excerpt: string; meta: { title?: string } };
   type Pagefind = { search: (q: string) => Promise<{ results: { data: () => Promise<Hit> }[] } | null>; init?: () => Promise<void> };
 
-  const input = document.getElementById('q') as HTMLInputElement | null;
+  const region = document.querySelector<HTMLElement>('[data-search]');
+  const input = document.getElementById('search') as HTMLInputElement | null;
   const list = document.getElementById('search-results');
   const status = document.getElementById('search-status');
+  const empty = document.querySelector<HTMLElement>('[data-search-empty]');
+  const listing = document.querySelector<HTMLElement>('[data-article-list]');
   let pf: Pagefind | null = null;
   let seq = 0;
 
@@ -30,8 +40,7 @@
     return pf;
   }
 
-  // Pagefind excerpts contain only <mark> tags around matches; rebuild them as DOM nodes
-  // instead of using innerHTML.
+  // Pagefind excerpts contain only <mark> around matches; rebuild them as DOM nodes, no innerHTML.
   function excerptNodes(excerpt: string) {
     const frag = document.createDocumentFragment();
     excerpt.split(/(<mark>.*?<\/mark>)/g).forEach((part) => {
@@ -43,44 +52,62 @@
     return frag;
   }
 
-  async function run(q: string) {
+  function reset() {
+    list?.replaceChildren();
+    if (status) status.textContent = '';
+    if (empty) empty.hidden = true;
+    if (listing) listing.hidden = false;
+  }
+
+  async function run(q: string, focusOnEmpty = false) {
     const mine = ++seq;
     if (!list || !status) return;
-    if (q.trim().length < 2) { list.replaceChildren(); status.textContent = ''; return; }
+    if (q.trim().length < 2) return reset();
     try {
       const engine = await load();
       const res = await engine.search(q);
-      const hits = await Promise.all((res?.results ?? []).slice(0, 8).map((r) => r.data()));
+      const hits = await Promise.all((res?.results ?? []).slice(0, 10).map((r) => r.data()));
       if (mine !== seq) return;
       list.replaceChildren(
         ...hits.map((h) => {
           const li = document.createElement('li');
           const a = document.createElement('a');
-          a.href = h.url; a.textContent = h.meta.title ?? h.url;
-          const p = document.createElement('p'); p.className = 'muted'; p.append(excerptNodes(h.excerpt));
+          a.href = h.url; a.textContent = (h.meta.title ?? h.url).replace(/ · Kile Research$/, '');
+          const p = document.createElement('p'); p.append(excerptNodes(h.excerpt));
           li.append(a, p);
           return li;
         }),
       );
-      status.textContent = hits.length ? `${hits.length} result${hits.length === 1 ? '' : 's'}` : 'No matches. Try a different word.';
+      status.textContent = hits.length ? `${hits.length} result${hits.length === 1 ? '' : 's'} for '${q}'` : `No articles match '${q}'.`;
+      if (empty) empty.hidden = hits.length > 0;
+      if (listing) listing.hidden = true;
+      if (!hits.length && focusOnEmpty) status.focus();
     } catch {
-      status.textContent = 'Search is available on the built site (run npm run build).';
+      status.textContent = 'Search works on the built site (npm run build, then npm run preview).';
     }
   }
 
-  if (input) {
+  if (region && input) {
+    region.hidden = false;
     let t: ReturnType<typeof setTimeout>;
-    input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => run(input.value), 150); });
-    input.form?.addEventListener('submit', (e) => { e.preventDefault(); run(input.value); });
+    input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => run(input.value), 200); });
+    input.form?.addEventListener('submit', (e) => { e.preventDefault(); run(input.value, true); });
+    document.querySelector('[data-search-clear]')?.addEventListener('click', () => { input.value = ''; reset(); input.focus(); });
     const initial = new URLSearchParams(location.search).get('q');
     if (initial) { input.value = initial; run(initial); }
+    if (location.hash === '#search') input.focus();
   }
 </script>
 
 <style>
-  .search { display: grid; gap: var(--space-3); max-width: 40rem; }
+  .search { display: grid; gap: var(--space-3); max-width: 40rem; margin-top: var(--space-6); }
+  .search label { font-weight: var(--weight-medium); color: var(--color-text-strong); }
+  .row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
   .status:empty { display: none; }
-  .results { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-4); }
+  .empty { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .empty[hidden] { display: none; }
+  .results { display: grid; gap: var(--space-5); }
   .results :global(a) { font-weight: var(--weight-semibold); font-size: var(--text-lg); }
-  .results :global(mark) { background: var(--color-bg-accent); color: var(--color-text-strong); padding: 0 0.1em; border-radius: 2px; }
+  .results :global(p) { font-family: var(--font-reading); color: var(--color-read-muted); margin-top: var(--space-1); }
+  .results :global(mark) { background: var(--color-mark-bg); color: var(--color-text-strong); padding: 0 0.1em; border-radius: 2px; }
 </style>

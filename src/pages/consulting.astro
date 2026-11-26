@@ -1,83 +1,179 @@
 ---
+// Consulting / Services (KILA-42 page-layouts §C, rev 5). All copy is placeholder for Chris.
+// Claims rule (Sentinel): no "bank-grade", "100% secure", "certified", "guaranteed", "audit";
+// standards are "informed by", never "compliant with". No prices until the Board approves.
 import BaseLayout from '../layouts/BaseLayout.astro';
-// STUB: placeholder copy and tiers. Final copy comes from Copy (Chris) and layout from Iris (KILA-42).
-const problems = [
-  { title: '“Should we run AI ourselves or pay for an API?”', body: 'We measure both on your workload and show the cost, speed and privacy trade-offs in plain numbers.' },
-  { title: '“Our AI feature feels slow.”', body: 'We benchmark time to first token, throughput and cold starts, find the bottleneck and fix the biggest one first.' },
-  { title: '“We handle sensitive data.”', body: 'We design private, self-hosted or region-locked setups with security and data protection built in from day one.' },
-  { title: '“We don’t know if it’s any good.”', body: 'We set up a small, repeatable evaluation so you can check quality before and after every change.' },
-];
-const tiers = [
-  { name: '[Tier 1: Assessment]', price: '[Price TBC]', items: ['[Placeholder] Short discovery call', '[Placeholder] Written options and trade-offs', '[Placeholder] Recommended next step'] },
-  { name: '[Tier 2: Pilot]', price: '[Price TBC]', items: ['[Placeholder] Working proof of concept', '[Placeholder] Benchmarks on your data', '[Placeholder] Security review of the design'] },
-  { name: '[Tier 3: Build and support]', price: '[Price TBC]', items: ['[Placeholder] Production deployment', '[Placeholder] Monitoring and evaluation', '[Placeholder] Ongoing support'] },
-];
+import ArticleCard from '../components/ArticleCard.astro';
+import ContactForm from '../components/forms/ContactForm.astro';
+import { services } from '../config/services';
+import { contentFlags, site } from '../config/site';
+import { getArticles } from '../lib/content';
+
+const articles = await getArticles();
+const fromResearch = [...articles].sort((a, b) => (a.data.level === 'beginner' ? -1 : 0) - (b.data.level === 'beginner' ? -1 : 0) || a.data.date.getTime() - b.data.date.getTime()).slice(0, 3);
 const steps = [
-  ['Talk', 'A short call to understand your goal, data and constraints.'],
-  ['Measure', 'We test real options on your workload and share the raw numbers.'],
-  ['Recommend', 'A clear written plan with costs, risks and trade-offs.'],
-  ['Build', 'If you go ahead, we build it securely and hand over everything.'],
+  ['Free intro call', '30 minutes to understand your goals.'],
+  ['Assessment', 'We look at your processes, data and risks.'],
+  ['Plan or build', 'A clear recommendation, or a small working setup.'],
+  ['Handover', 'Documentation and training so your team owns it.'],
 ];
+const weWill = [
+  ...(contentFlags.dataStaysYours ? ["Your data stays yours. We use it only for your project, never sell or share it, and return or delete it when we're done."] : []),
+  'We never use your data to train AI models.',
+  'Explain everything in plain language.',
+  "Tell you if AI isn't the right answer.",
+];
+const weWont = [
+  'Lock you into our tools.',
+  ...(contentFlags.flexibleTerms ? ['Tie you into long contracts: fixed-scope projects or month-to-month.'] : []),
+];
+const faqs = [
+  ['Do we need technical staff?', "[Placeholder] No. We explain everything in plain language and hand over documentation your team can follow."],
+  ['What does it cost?', '[Placeholder] Pricing is being finalised. Tell us about your business and we will give you a clear quote before any work starts.'],
+  ['Will our data leave our business?', '[Placeholder] Only if you choose a setup that needs it. Private and local options keep data on your own machines or private cloud.'],
+  ['Which service should we start with?', 'Not sure? Start with the adoption assessment, or just tell us your problem.'],
+  ['Do you work remotely?', '[Placeholder] Yes.'],
+  ['How long does it take?', '[Placeholder] It depends on the service. Typical lengths are to be confirmed.'],
+];
+const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8.5 3 3 7-7"/></svg>';
 ---
-<BaseLayout title="Consulting for small and mid-sized businesses" description="Kile Research helps small and mid-sized businesses choose, run and measure AI models: practical, private and secure by default.">
-  <section class="hero" data-surface="ink">
-    <div class="container stack">
-      <p class="overline">Consulting</p>
-      <h1>Practical AI for small and mid-sized businesses</h1>
-      <p class="lead">We bring the same measured, reproducible approach from our research to your business. No hype, just numbers you can check and systems you can trust.</p>
-      <p><a class="btn btn-primary" href="/contact/">Book an intro call</a></p>
+<BaseLayout title="Consulting for small businesses" description="Practical AI for small businesses: adoption assessments, private LLM deployment, inference cost optimisation and AI security reviews." enquiry>
+  <section class="hero" data-surface="ink" aria-labelledby="c-hero">
+    <div class="container stack hero-inner">
+      <p class="overline">Consulting for small businesses</p>
+      <h1 id="c-hero">Practical AI for your business, without the guesswork.</h1>
+      <p class="lead">We help small teams work out where AI helps, run it privately and affordably, and keep it secure.</p>
+      <p class="actions"><a class="btn btn-primary" href="#enquiry">Tell us about your business</a> <a href="#services">See our services ↓</a></p>
     </div>
   </section>
 
-  <section class="container section" aria-labelledby="problems-title">
-    <h2 id="problems-title">Problems we solve</h2>
-    <ul class="grid list">{problems.map((p) => <li class="card"><h3>{p.title}</h3><p class="muted">{p.body}</p></li>)}</ul>
+  <section class="container section-tight" aria-labelledby="problems-title">
+    <h2 id="problems-title">Sound familiar?</h2>
+    <ul class="list-reset grid-2 problems">
+      {services.map((s) => (
+        <li class="card">
+          <h3>“{s.problem}”</h3>
+          <a class="stretched" href={`#${s.id}`}>How we help<span class="visually-hidden">: {s.name}</span> →</a>
+        </li>
+      ))}
+    </ul>
   </section>
 
-  <section class="band" aria-labelledby="tiers-title">
-    <div class="container section">
-      <h2 id="tiers-title">Ways to work with us</h2>
-      <p class="alert alert-info note"><span>Placeholder: offer tiers and prices are still being defined.</span></p>
-      <ul class="grid list">
-        {tiers.map((t) => (
-          <li class="card tier">
-            <h3>{t.name}</h3>
-            <p class="price">{t.price}</p>
-            <ul>{t.items.map((i) => <li>{i}</li>)}</ul>
-          </li>
-        ))}
-      </ul>
+  <section class="container section-tight" id="services" aria-labelledby="services-title" tabindex="-1">
+    <h2 id="services-title">How we can help</h2>
+    <ul class="list-reset grid-2 services">
+      {services.map((s, i) => (
+        <li class="card service" id={s.id} tabindex="-1">
+          <p class="overline">{String(i + 1).padStart(2, '0')}</p>
+          <h3>{s.name}</h3>
+          <p><strong>Best for:</strong> {s.bestFor}</p>
+          <div>
+            <p><strong>What you get:</strong></p>
+            <ul class="list-reset bullets">{s.bullets.map((b) => <li><Fragment set:html={check} /><span>{b.lead && <strong>{b.lead} </strong>}{b.text}</span></li>)}</ul>
+          </div>
+          <p class="muted small">Typical length: [TBC]</p>
+          <p class="muted small">Price: [Price on request — pending Board approval]</p>
+          {s.id === 'cost' && <p class="muted small">We never quote example savings. Numbers only ever come from measuring your own usage.</p>}
+          {s.id === 'security' && (
+            <>
+              <p class="muted small">Informed by the OWASP Top 10 for LLM Applications and the NIST AI Risk Management Framework.</p>
+              <details>
+                <summary>What's not included</summary>
+                <ul>
+                  <li>Testing your AI vendors' own platforms (we review how you've set them up)</li>
+                  <li>Legal advice on the EU AI Act, GDPR or sector rules (we'll flag issues and refer you to your lawyer or DPO)</li>
+                  <li>Certification, or any guarantee that a system is secure</li>
+                  <li>Red-teaming of foundation models</li>
+                </ul>
+              </details>
+            </>
+          )}
+          <p class="push"><a class="btn btn-secondary" href={`/consulting/?service=${s.id}#enquiry`}>Ask about {s.name}</a></p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="band" id="process" aria-labelledby="process-title">
+    <div class="container section-tight">
+      <h2 id="process-title">How it works</h2>
+      <ol class="list-reset steps">{steps.map(([t, b], i) => <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p class="muted">{b}</p></div></li>)}</ol>
+      <p class="muted small">Durations are placeholders until confirmed.</p>
     </div>
   </section>
 
-  <section class="container section" aria-labelledby="process-title">
-    <h2 id="process-title">How it works</h2>
-    <ol class="steps">{steps.map(([t, b], i) => <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p class="muted">{b}</p></div></li>)}</ol>
+  <section class="container section-tight" aria-labelledby="expect-title">
+    <h2 id="expect-title">What you can expect</h2>
+    <div class="grid-2 expect">
+      <div><h3>We will</h3><ul class="list-reset bullets">{weWill.map((t) => <li><Fragment set:html={check} /><span>{t}</span></li>)}</ul></div>
+      <div><h3>We won't</h3><ul class="list-reset bullets">{weWont.map((t) => <li><span class="x" aria-hidden="true">×</span><span>{t}</span></li>)}</ul></div>
+    </div>
   </section>
 
-  <section class="container">
-    <div class="enquire card">
-      <h2>Tell us what you're trying to do</h2>
-      <p class="muted">We'll reply within two working days with honest advice, even if that's “you don't need us”.</p>
-      <p><a class="btn btn-primary" href="/contact/">Start an enquiry</a></p>
+  <section class="container section-tight" aria-labelledby="think-title">
+    <h2 id="think-title">See how we think</h2>
+    <div class="grid">{fromResearch.map((a) => <ArticleCard article={a} />)}</div>
+  </section>
+
+  <section class="container section-tight" aria-labelledby="faq-title">
+    <h2 id="faq-title">Questions</h2>
+    <div class="faq">{faqs.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div>
+  </section>
+
+  <section class="container section-tight" id="enquiry" aria-labelledby="enquiry-title" tabindex="-1">
+    <div class="enquiry">
+      <div>
+        <h2 id="enquiry-title">Tell us about your business</h2>
+        <div class="form-wrap"><ContactForm idPrefix="cons" /></div>
+      </div>
+      <aside class="next" aria-labelledby="next-title">
+        <h3 id="next-title">What happens next</h3>
+        <ol>
+          <li>We reply within {site.replyDays} working days.</li>
+          <li>We book a 30-minute call.</li>
+          <li>No obligation.</li>
+        </ol>
+        <p class="muted small">Prefer email? <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
+      </aside>
     </div>
   </section>
 </BaseLayout>
+
 <style>
   .hero { padding-block: var(--space-section); }
-  .hero h1 { max-width: 20ch; }
-  h2 { font-size: var(--text-3xl); }
-  .list { list-style: none; padding: 0; margin: var(--space-8) 0 0; }
-  .card h3 { font-size: var(--text-xl); }
+  .hero-inner { max-width: 48rem; margin-inline: 0; }
+  @media (min-width: 75rem) { .hero-inner { margin-inline: auto; max-width: var(--container-max); } .hero-inner > * { max-width: 44rem; } }
+  .hero h1 { font-size: var(--text-4xl); }
+  .hero .lead { color: var(--color-text-muted); }
+  .hero .overline { color: var(--color-text-muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); align-items: center; }
+  .actions > a:not(.btn) { min-height: var(--target-min); display: inline-flex; align-items: center; }
+  .section-tight { padding-block: var(--space-12); }
+  .section-tight h2, .band h2 { margin-bottom: var(--space-6); }
+  .problems h3 { font-size: var(--text-lg); font-family: var(--font-reading); font-weight: var(--weight-regular); font-style: italic; }
+  .problems .stretched { color: var(--color-link); font-weight: var(--weight-semibold); text-decoration: underline; }
+  .service { gap: var(--space-4); scroll-margin-top: var(--scroll-offset); }
+  .service h3 { font-size: var(--text-2xl); }
+  .bullets { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+  .bullets li { display: grid; grid-template-columns: 1rem 1fr; gap: var(--space-3); align-items: start; }
+  .bullets :global(svg) { width: 1rem; height: 1rem; margin-top: 0.3em; color: var(--color-success); }
+  .x { font-weight: var(--weight-bold); color: var(--color-text-muted); line-height: 1.4; }
+  .small { font-size: var(--text-sm); }
+  .push { margin-top: auto; padding-top: var(--space-2); }
+  .service details ul { margin: 0 0 var(--space-2); padding-left: 1.2em; font-size: var(--text-sm); display: grid; gap: var(--space-1); }
   .band { background: var(--color-bg-subtle); border-block: 1px solid var(--color-border); }
-  .note { margin-top: var(--space-4); }
-  .note span { color: var(--color-text); }
-  .price { font-size: var(--text-lg); font-weight: var(--weight-semibold); color: var(--color-accent); }
-  .tier ul { margin: 0; padding-left: 1.2em; }
-  .steps { list-style: none; padding: 0; margin: var(--space-8) 0 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .steps { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .steps { grid-template-columns: repeat(4, 1fr); } }
   .steps li { display: flex; gap: var(--space-4); }
-  .steps h3 { font-size: var(--text-xl); }
-  .n { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: var(--radius-pill); background: var(--color-bg-accent); color: var(--color-accent); font-weight: var(--weight-bold); }
-  .enquire { padding: var(--space-10); align-items: flex-start; }
-  .enquire:hover { box-shadow: var(--shadow-1); border-color: var(--color-border); }
+  .steps h3 { font-size: var(--text-lg); }
+  .n { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: var(--radius-pill); border: 2px solid var(--color-accent); color: var(--color-text-strong); font-weight: var(--weight-bold); font-family: var(--font-mono); }
+  .expect h3 { font-size: var(--text-xl); margin-bottom: var(--space-2); }
+  .faq { max-width: 48rem; display: grid; border-top: 1px solid var(--color-rule); }
+  .faq details { border-bottom: 1px solid var(--color-rule); }
+  .faq details p { padding: 0 0 var(--space-4) var(--space-8); color: var(--color-read-text); font-family: var(--font-reading); }
+  .enquiry { display: grid; gap: var(--space-10); }
+  @media (min-width: 64rem) { .enquiry { grid-template-columns: minmax(0, 36rem) minmax(0, 1fr); } }
+  .next { align-self: start; padding: var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg); display: grid; gap: var(--space-3); }
+  .next ol { margin: 0; padding-left: 1.2em; display: grid; gap: var(--space-2); }
+  #services, #enquiry { scroll-margin-top: var(--scroll-offset); }
 </style>

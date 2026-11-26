@@ -1,33 +1,56 @@
 ---
 import Logo from './Logo.astro';
 import { site } from '../config/site';
+interface Props { progress?: boolean }
+const { progress = false } = Astro.props;
 const path = Astro.url.pathname;
 ---
 <header class="site-header">
+  {progress && <div class="progress" aria-hidden="true"></div>}
   <div class="container bar">
     <a href="/" class="home" aria-label="Kile Research home"><Logo /></a>
-    <nav aria-label="Main">
-      <ul>
+    <nav aria-label="Main" class="main-nav">
+      <ul class="list-reset">
         {site.nav.map((item) => (
-          <li>
-            <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>{item.label}</a>
-          </li>
+          <li><a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>{item.label}</a></li>
         ))}
       </ul>
     </nav>
+    <div class="tools">
+      <button type="button" class="btn btn-icon icon-btn theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Dark theme" title="Dark theme" hidden>
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      </button>
+      <a class="btn btn-icon icon-btn" href="/research/#search" aria-label="Search research" title="Search research">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      </a>
+      <a class="btn btn-secondary cta" href="/consulting/">Work with us</a>
+    </div>
   </div>
 </header>
 
 <style>
-  .site-header { border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
-  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-6); padding-block: var(--space-3); }
-  .home { text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
-  ul { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); list-style: none; margin: 0; padding: 0; }
-  nav a {
+  .site-header { position: relative; border-bottom: 1px solid var(--color-border); background: var(--color-page); z-index: var(--z-header); }
+  @media (min-width: 48rem) { .site-header { position: sticky; top: 0; } }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); min-height: var(--header-height); padding-block: var(--space-2); }
+  .home { text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; margin-right: auto; }
+  .main-nav { order: 3; flex-basis: 100%; }
+  @media (min-width: 48rem) { .main-nav { order: 0; flex-basis: auto; } }
+  .main-nav ul { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+  .main-nav a {
     display: inline-flex; align-items: center; min-height: var(--target-min); padding-inline: var(--space-3);
     color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); border-radius: var(--radius-md);
   }
-  nav a:hover { background: var(--color-bg-subtle); color: var(--color-text-strong); }
-  nav a[aria-current='page'] { color: var(--color-accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
-  @media (max-width: 30rem) { nav a { padding-inline: var(--space-2); } }
+  .main-nav li:first-child a { padding-left: 0; }
+  @media (min-width: 48rem) { .main-nav li:first-child a { padding-left: var(--space-3); } }
+  .main-nav a:hover { color: var(--color-text-strong); text-decoration: underline; }
+  .main-nav a[aria-current='page'] { color: var(--color-text-strong); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.4em; text-decoration-color: var(--color-accent); }
+  .tools { display: flex; align-items: center; gap: var(--space-1); }
+  .icon-btn { background: none; color: var(--color-text-strong); border: 1px solid transparent; }
+  .icon-btn:hover { background: var(--color-bg-subtle); }
+  .theme-toggle .sun { display: none; }
+  .theme-toggle[aria-pressed='true'] .sun { display: block; }
+  .theme-toggle[aria-pressed='true'] .moon { display: none; }
+  .cta { margin-left: var(--space-2); }
+  @media (max-width: 26rem) { .cta { display: none; } }
 </style>

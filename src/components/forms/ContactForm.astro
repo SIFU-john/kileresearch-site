@@ -1,54 +1,83 @@
 ---
-import { formConfig } from '../../lib/forms/config';
+// Enquiry form (KILA-42 page-layouts §C8, KILA-43 Option A). A plain urlencoded POST that works
+// without JS; client.ts adds inline validation, an error summary and an in-page success message.
+// No phone, budget, tracking or marketing fields. Honeypot plus server-side checks and Turnstile.
 import { site } from '../../config/site';
-const cfg = formConfig('contact');
-const id = 'ct';
+import { services } from '../../config/services';
+import { integrations } from '../../config/integrations';
+interface Props { idPrefix?: string; selected?: string | undefined }
+const { idPrefix = 'enq', selected } = Astro.props;
+const { contact, turnstileSiteKey } = integrations;
+const id = (s: string) => `${idPrefix}-${s}`;
+const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquiry from the Kile Research website')}`;
 ---
-<form
-  class="contact-form"
-  data-form-kind="contact"
-  data-provider={cfg.provider}
-  data-endpoint={cfg.endpoint}
-  data-mailto={site.contactEmail}
-  data-mailto-subject="Enquiry from the Kile Research website"
-  method="post"
-  action={cfg.endpoint ?? ''}
-  aria-describedby={`${id}-privacy`}
->
-  <div class="field">
-    <label for={`${id}-name`}>Name</label>
-    <input class="input" id={`${id}-name`} name="name" autocomplete="name" required maxlength="120" aria-describedby={`${id}-name-error`} />
-    <p class="field-error" id={`${id}-name-error`} hidden></p>
+{contact.provider === 'none' ? (
+  <div class="alert alert-info" id={id('fallback')}>
+    <p>Our enquiry form isn't switched on yet. Please email us at <a href={mailto}>{site.contactEmail}</a>.</p>
+    <p class="hint">Please don't include personal data about customers or staff.</p>
   </div>
-  <div class="field">
-    <label for={`${id}-email`}>Work email</label>
-    <input class="input" id={`${id}-email`} name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby={`${id}-email-error`} />
-    <p class="field-error" id={`${id}-email-error`} hidden></p>
+) : (
+  <div class="enquiry-form" data-enquiry>
+    <div class="alert error-summary alert-danger" id={id('summary')} tabindex="-1" role="alert" hidden>
+      <p><strong>There's a problem with your enquiry</strong></p>
+      <ul data-summary-list></ul>
+    </div>
+    <form class="form" method="post" action={contact.action} data-enhance={contact.provider === 'pages-function' ? '' : undefined} novalidate={false}>
+      <div class="field">
+        <label for={id('name')}>Name</label>
+        <input class="input" id={id('name')} name="name" autocomplete="name" required maxlength="100" aria-describedby={id('name-error')} />
+        <p class="field-error" id={id('name-error')} hidden></p>
+      </div>
+      <div class="field">
+        <label for={id('email')}>Work email</label>
+        <input class="input" id={id('email')} name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby={id('email-error')} />
+        <p class="field-error" id={id('email-error')} hidden></p>
+      </div>
+      <div class="field">
+        <label for={id('company')}>Business name <span class="optional">(optional)</span></label>
+        <input class="input" id={id('company')} name="company" autocomplete="organization" maxlength="150" />
+      </div>
+      <div class="field">
+        <label for={id('service')}>Which service are you interested in?</label>
+        <select class="input" id={id('service')} name="service" data-service-select>
+          {services.map((s) => <option value={s.id} selected={selected === s.id}>{s.name}</option>)}
+          <option value="not-sure" selected={!selected}>Not sure yet</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for={id('message')}>Tell us a bit more <span class="optional">(optional)</span></label>
+        <p class="hint" id={id('message-hint')}>Please don't include sensitive personal information (such as health or financial account details) or personal data about customers or staff. Up to 2,000 characters.</p>
+        <textarea class="input" id={id('message')} name="message" maxlength="2000" aria-describedby={`${id('message-hint')} ${id('message-error')}`}></textarea>
+        <p class="field-error" id={id('message-error')} hidden></p>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for={id('website')}>Leave this field empty</label>
+        <input id={id('website')} name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto" data-size="flexible" data-appearance="interaction-only"></div>}
+      <p class="hint">We'll only use this to reply to you. See our <a href="/privacy/">privacy notice</a>.</p>
+      <p><button class="btn btn-primary" type="submit">Send enquiry</button></p>
+    </form>
+    {turnstileSiteKey && (
+      <noscript>
+        <p class="alert alert-info"><span>Our spam check needs JavaScript. You can also email us at <a href={mailto}>{site.contactEmail}</a>.</span></p>
+      </noscript>
+    )}
+    <div class="alert alert-success" data-status="success" tabindex="-1" role="status" hidden>
+      <p><strong>Thanks, your enquiry has been sent.</strong> We'll reply within {site.replyDays} working days.</p>
+    </div>
+    <div class="alert alert-info" data-status="unavailable" tabindex="-1" role="status" hidden>
+      <p>Our enquiry form isn't switched on yet. <a data-mailto-link href={mailto}>Send your enquiry by email instead</a>; we've filled it in for you.</p>
+    </div>
+    <div class="alert alert-danger" data-status="error" tabindex="-1" role="status" hidden>
+      <p>Your enquiry didn't send. Please try again, or <a data-mailto-link href={mailto}>email us directly</a>.</p>
+    </div>
   </div>
-  <div class="field">
-    <label for={`${id}-company`}>Company <span class="muted">(optional)</span></label>
-    <input class="input" id={`${id}-company`} name="company" autocomplete="organization" maxlength="200" />
-  </div>
-  <div class="field">
-    <label for={`${id}-message`}>How can we help?</label>
-    <p class="hint" id={`${id}-message-hint`}>A few lines is plenty. Please don't include passwords, patient or payment data.</p>
-    <textarea class="input" id={`${id}-message`} name="message" required minlength="10" maxlength="5000" aria-describedby={`${id}-message-hint ${id}-message-error`}></textarea>
-    <p class="field-error" id={`${id}-message-error`} hidden></p>
-  </div>
-  <div class="hp" aria-hidden="true"><label>Leave empty <input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
-  <p class="hint" id={`${id}-privacy`}>We use your details only to reply. See our <a href="/privacy/">privacy notice</a>.</p>
-  <p><button class="btn btn-primary" type="submit">Send message</button></p>
-  <div class="alert alert-success" data-status="success" tabindex="-1" hidden><p>Thanks, we've got your message and will reply within two working days.</p></div>
-  <div class="alert alert-info" data-status="fallback" tabindex="-1" hidden>
-    <p>Our contact form isn't connected yet. <a data-mailto-link href={`mailto:${site.contactEmail}`}>Send your message by email instead</a>; we've filled it in for you.</p>
-  </div>
-  <div class="alert alert-danger" data-status="error" tabindex="-1" hidden>
-    <p>Your message didn't send. Please try again, or <a data-mailto-link href={`mailto:${site.contactEmail}`}>email us directly</a>.</p>
-  </div>
-</form>
+)}
 <script>
-  import '../../lib/forms/client';
+  import '../../lib/forms/enquiry';
 </script>
 <style>
-  .contact-form { display: grid; gap: var(--space-5); max-width: 40rem; }
+  .enquiry-form { display: grid; gap: var(--space-5); max-width: 36rem; }
+  .error-summary ul { margin: 0; padding-left: 1.2em; }
 </style>

@@ -1,29 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AuthorBox from '../components/AuthorBox.astro';
 import { site } from '../config/site';
 ---
-<BaseLayout title="About" description="Kile Research writes hands-on, reproducible guides to how AI models run, and helps small and mid-sized businesses adopt AI safely.">
+<BaseLayout title="About" description="Kile Research writes plain-language, reproducible guides to how AI models run, and helps small businesses adopt AI safely.">
   <div class="container section">
-    <div class="prose">
-      <p class="overline">About</p>
-      <h1>We measure before we claim</h1>
-      <p class="lead">Kile Research publishes practical research on AI and LLM inference: how models actually run, what makes them fast or slow, and how to choose between options with data.</p>
+    <div class="page-prose">
+      <h1>About Kile Research</h1>
+      <p class="lead">We publish practical research on AI and LLM inference: how models actually run, what makes them fast or slow, and how to choose between options.</p>
       <h2>What we write</h2>
-      <p>Our articles are for developers, IT and cloud teams, and curious learners with a beginner-to-intermediate grasp of AI. Each one teaches a single idea, takes a few minutes to follow, and ends with something you built and measured yourself.</p>
-      <h2>How we work</h2>
+      <p>Our articles are for developers, IT teams and curious learners at beginner to intermediate level. Each one teaches a single idea and ends with something you ran and measured yourself.</p>
+      <h2>How we write</h2>
       <ul>
-        <li><strong>Every number is real.</strong> Commands and results come from our own test rig, with the hardware and versions stated. Anything we haven't run is labelled <em>untested</em>.</li>
-        <li><strong>Everything is reproducible.</strong> Code and raw results live in our <a href={site.codeRepo} rel="noopener">public GitHub repository</a> under the MIT licence.</li>
-        <li><strong>Facts and opinions stay separate.</strong> We say what we measured, what the docs say, and what we think it means.</li>
+        <li><strong>Reproducible.</strong> Every article links to its code in our <a href={site.codeRepo}>public GitHub repository<span class="visually-hidden"> (opens external site)</span></a>.</li>
+        <li><strong>Honest about limits.</strong> We say what we tested on, and that your numbers will differ.</li>
+        <li><strong>Facts and opinions stay separate.</strong> We say what we measured, what the documentation says, and what we think it means.</li>
       </ul>
       <h2>Working with businesses</h2>
-      <p>We also help small and mid-sized businesses put AI to work in a way that is measured, private and secure. <a href="/consulting/">See how we help</a>.</p>
+      <p>We also help small businesses put AI to work in a way that is practical, private and secure. <a href="/consulting/">See how we can help</a>.</p>
       <h2>Spotted a mistake?</h2>
-      <p>Tell us. <a href={`${site.codeRepo}/issues`} rel="noopener">Open an issue on GitHub</a> or <a href="/contact/">get in touch</a>. We correct errors openly and note the update on the article.</p>
+      <p>Tell us. <a href={`${site.codeRepo}/issues`}>Open an issue on GitHub<span class="visually-hidden"> (opens external site)</span></a> or <a href="/contact/">get in touch</a>. We correct errors openly and note the update on the article.</p>
+      <AuthorBox id="kile-research" />
     </div>
   </div>
 </BaseLayout>
-<style>
-  h1 { margin-block: var(--space-3) var(--space-4); }
-  .prose .lead { font-size: var(--text-xl); }
-</style>

@@ -1,35 +1,56 @@
 ---
-import { site } from '../config/site';
+import { site, displayDomain } from '../config/site';
+import { seriesUrl } from '../lib/content';
 import Logo from './Logo.astro';
 const year = new Date().getFullYear();
+const domain = displayDomain(Astro.site);
 ---
 <footer class="site-footer" data-surface="ink">
   <div class="container cols">
-    <div class="stack">
-      <Logo />
+    <div class="about">
+      <a href="/" class="home" aria-label="Kile Research home"><Logo /></a>
       <p class="muted">{site.tagline}</p>
     </div>
-    <nav aria-label="Footer">
-      <ul>
-        <li><a href="/research/">Research</a></li>
-        <li><a href="/consulting/">Consulting</a></li>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        <li><a href="/privacy/">Privacy</a></li>
+    <nav aria-labelledby="f-research">
+      <h2 id="f-research">Research</h2>
+      <ul class="list-reset">
+        <li><a href="/research/">Latest</a></li>
+        <li><a href={seriesUrl("Beginner's Guide to Inference")}>Series</a></li>
         <li><a href="/rss.xml">RSS feed</a></li>
-        <li><a href={site.codeRepo} rel="noopener">Code on GitHub</a></li>
+        <li><a href={site.codeRepo}>Code on GitHub<span class="visually-hidden"> (opens external site)</span></a></li>
+        {site.mediumProfile && <li><a href={site.mediumProfile}>Also on Medium<span class="visually-hidden"> (opens external site)</span></a></li>}
+      </ul>
+    </nav>
+    <nav aria-labelledby="f-company">
+      <h2 id="f-company">Company</h2>
+      <ul class="list-reset">
+        <li><a href="/about/">About</a></li>
+        <li><a href="/consulting/">Consulting</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="f-trust">
+      <h2 id="f-trust">Trust</h2>
+      <ul class="list-reset">
+        <li><a href="/privacy/">Privacy</a></li>
+        <li><a href="/accessibility/">Accessibility statement</a></li>
+        <li><button type="button" class="linklike" data-theme-reset hidden>Use system theme</button></li>
       </ul>
     </nav>
   </div>
   <div class="container legal">
-    <p>© {year} Kile Research. Articles and code are MIT licensed. No cookies, no trackers.</p>
+    <p>© {year} Kile Research · {domain}</p>
   </div>
 </footer>
 
 <style>
   .site-footer { margin-top: var(--space-section); padding-block: var(--space-12) var(--space-8); }
-  .cols { display: grid; gap: var(--space-8); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
-  ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1) var(--space-6); }
-  a { display: inline-flex; align-items: center; min-height: var(--target-min); }
+  .cols { display: grid; gap: var(--space-8); grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); }
+  .about { grid-column: 1 / -1; display: grid; gap: var(--space-3); max-width: 28rem; }
+  @media (min-width: 64rem) { .cols { grid-template-columns: 2fr repeat(3, 1fr); } .about { grid-column: auto; } }
+  .home { text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  h2 { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-overline); text-transform: uppercase; color: var(--color-text-muted); font-weight: var(--weight-regular); margin-bottom: var(--space-2); }
+  nav a, .linklike { display: inline-flex; align-items: center; min-height: var(--target-min); }
+  .linklike { background: none; border: 0; padding: 0; font: inherit; color: var(--color-link); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
   .legal { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--color-border); font-size: var(--text-sm); color: var(--color-text-muted); }
 </style>

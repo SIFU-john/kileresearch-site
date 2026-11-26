@@ -1,59 +1,101 @@
-// Single source of truth for HTTP security headers.
-// scripts/write-host-config.mjs turns this into host-specific files after each build:
-//   dist/_headers                                   (Netlify / Cloudflare Pages format)
-//   infra/cloudfront-response-headers-policy.json   (AWS CloudFront, our default host)
-// scripts/serve.mjs applies the same headers locally, so Lighthouse CI tests the real CSP.
+// Single source of truth for HTTP response headers (KILA-43 `security-headers-csp` rev 3).
+// scripts/write-host-config.mjs turns this into dist/_headers (Cloudflare Pages) after each
+// build, and scripts/serve.mjs applies that same file locally, so Lighthouse CI tests the
+// real policy. Don't hand-edit a second copy.
+//
+// HSTS is deliberately NOT here: it is set once, in the Cloudflare dashboard, with a staged
+// max-age ramp (KILA-43 `cloudflare-domain-hardening` §3).
+//
+// Third-party origins are added only when the matching integration is configured
+// (config/integrations.mjs), so the policy never lists an origin we don't use.
+import { integrations, enquiryPaths } from './integrations.mjs';
 
-/** Extra origins the browser may POST form data to (from the forms adapter config). */
-function formOrigins(env) {
-  return ['PUBLIC_CONTACT_ENDPOINT', 'PUBLIC_NEWSLETTER_ENDPOINT']
-    .map((k) => env[k])
-    .filter(Boolean)
-    .map((u) => new URL(u).origin);
-}
+const TURNSTILE = 'https://challenges.cloudflare.com';
+const CF_BEACON = 'https://static.cloudflareinsights.com';
+const CF_BEACON_REPORT = 'https://cloudflareinsights.com';
 
-export function buildCsp(env = process.env) {
-  const forms = formOrigins(env);
-  const directives = {
+export function cspDirectives(env = process.env, { enquiry = false } = {}) {
+  const cfg = integrations(env);
+  const analytics = cfg.analyticsToken ? true : false;
+  const turnstile = enquiry && Boolean(cfg.turnstileSiteKey);
+  const formTargets = [cfg.newsletter.configured && cfg.newsletter.origin, enquiry && cfg.contact.provider === 'formspree' && cfg.contact.origin].filter(Boolean);
+  return {
     'default-src': ["'none'"],
     // 'wasm-unsafe-eval' is required by Pagefind's WebAssembly search index.
     // It allows WebAssembly compilation only; JavaScript eval() stays blocked.
-    'script-src': ["'self'", "'wasm-unsafe-eval'"],
+    'script-src': ["'self'", "'wasm-unsafe-eval'", ...(analytics ? [CF_BEACON] : []), ...(turnstile ? [TURNSTILE] : [])],
     'style-src': ["'self'"],
-    'img-src': ["'self'", 'data:'],
+    'img-src': ["'self'"],
     'font-src': ["'self'"],
-    'connect-src': ["'self'", ...forms],
-    'form-action': ["'self'", ...forms],
+    'connect-src': ["'self'", ...(analytics ? [CF_BEACON_REPORT] : [])],
+    ...(turnstile ? { 'frame-src': [TURNSTILE] } : {}),
+    'form-action': ["'self'", ...formTargets],
     'manifest-src': ["'self'"],
     'base-uri': ["'none'"],
     'frame-ancestors': ["'none'"],
     'object-src': ["'none'"],
     'upgrade-insecure-requests': [],
   };
-  return Object.entries(directives)
+}
+
+export function buildCsp(env = process.env, opts = {}) {
+  return Object.entries(cspDirectives(env, opts))
     .map(([k, v]) => [k, ...v].join(' '))
     .join('; ');
 }
 
+const cspHeaderName = (env) => (integrations(env).cspMode === 'report-only' ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy');
+
+/** Headers for every path. */
 export function securityHeaders(env = process.env) {
   return {
-    'Content-Security-Policy': buildCsp(env),
-    'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+    [cspHeaderName(env)]: buildCsp(env),
     'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy':
-      'accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), interest-cohort=(), browsing-topics=()',
+      'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()',
+    'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Resource-Policy': 'same-origin',
-    'X-Permitted-Cross-Domain-Policies': 'none',
   };
 }
 
-/** Cache rules by path prefix. Hashed build assets are immutable. */
-export const cacheRules = [
-  { pattern: '/_astro/*', value: 'public, max-age=31536000, immutable' },
-  { pattern: '/fonts/*', value: 'public, max-age=31536000, immutable' },
-  { pattern: '/pagefind/*', value: 'public, max-age=3600' },
-  { pattern: '/*', value: 'public, max-age=0, must-revalidate' },
-];
+/**
+ * Ordered _headers rules. A rule with `detach` removes an inherited header first (Cloudflare
+ * Pages "! Header" syntax); without it Cloudflare would send both CSPs and the browser would
+ * enforce the intersection.
+ */
+export function headerRules(env = process.env) {
+  const cfg = integrations(env);
+  const rules = [{ pattern: '/*', headers: securityHeaders(env) }];
+  if (cfg.turnstileSiteKey) {
+    const name = cspHeaderName(env);
+    for (const pattern of enquiryPaths) rules.push({ pattern, detach: [name], headers: { [name]: buildCsp(env, { enquiry: true }) } });
+  } else if (cfg.contact.provider === 'formspree') {
+    const name = cspHeaderName(env);
+    for (const pattern of enquiryPaths) rules.push({ pattern, detach: [name], headers: { [name]: buildCsp(env, { enquiry: true }) } });
+  }
+  rules.push(
+    { pattern: '/_astro/*', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    { pattern: '/fonts/*', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    { pattern: '/pagefind/*', headers: { 'Cache-Control': 'public, max-age=3600' } },
+    // Not content-hashed, so a short cache (KILA-42 doc 2 §14).
+    { pattern: '/theme.js', headers: { 'Cache-Control': 'public, max-age=3600' } },
+    { pattern: '/js/*', headers: { 'Cache-Control': 'public, max-age=3600' } },
+    // Production *.pages.dev alias and previews must never be indexed.
+    { pattern: 'https://:project.pages.dev/*', headers: { 'X-Robots-Tag': 'noindex' } },
+  );
+  return rules;
+}
+
+/** Render rules in Cloudflare Pages `_headers` format. */
+export function renderHeadersFile(env = process.env) {
+  const out = ['# Generated by scripts/write-host-config.mjs from config/security-headers.mjs. Do not edit.', '# HSTS is set in the Cloudflare dashboard (SSL/TLS > Edge Certificates), not here.', ''];
+  for (const r of headerRules(env)) {
+    out.push(r.pattern);
+    for (const d of r.detach ?? []) out.push(`  ! ${d}`);
+    for (const [k, v] of Object.entries(r.headers)) out.push(`  ${k}: ${v}`);
+    out.push('');
+  }
+  return out.join('\n');
+}

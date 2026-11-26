@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import ArticleCard from '../../../components/ArticleCard.astro';
-import TagFilter from '../../../components/TagFilter.astro';
+import ArticleRow from '../../../components/ArticleRow.astro';
+import FilterNav from '../../../components/FilterNav.astro';
 import { getArticles, seriesUrl, slugify, type Article } from '../../../lib/content';
 
 export async function getStaticPaths() {
@@ -17,15 +17,16 @@ const { all, name, items } = Astro.props;
 ---
 <BaseLayout title={name} description={`Every part of the ${name} series from Kile Research, in reading order, with runnable code for each step.`}>
   <div class="container section">
-    <p class="overline"><a href="/research/">Research</a> / Series</p>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="/research/">Research</a> / Series</nav>
     <h1>{name}</h1>
-    <p class="lead">{items.length} parts so far, in reading order. Each one teaches one idea and ends with something you built and measured yourself.</p>
-    <TagFilter articles={all} current={seriesUrl(name)} />
-    <div class="grid list">{items.map((a) => <ArticleCard article={a} headingLevel="h2" />)}</div>
+    <p class="lead">{items.length} parts, in reading order.</p>
+    <FilterNav articles={all} current={seriesUrl(name)} />
+    <ol class="list-reset list">{items.map((a) => <li><ArticleRow article={a} headingLevel="h2" /></li>)}</ol>
   </div>
 </BaseLayout>
 <style>
+  .crumb { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .crumb a { color: inherit; }
   h1 { margin-block: var(--space-3); }
-  .list { margin-top: var(--space-8); }
-  .overline a { color: inherit; }
+  .list { margin-top: var(--space-6); border-top: 1px solid var(--color-rule); max-width: 52rem; }
 </style>

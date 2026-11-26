@@ -1,0 +1,4 @@
+# Cloudflare Pages redirects. www -> apex is a Cloudflare Redirect Rule, not this file
+# (docs/cloudflare-pages.md). Trailing slashes are handled by Pages automatically.
+/feed /rss.xml 301
+/feed/ /rss.xml 301

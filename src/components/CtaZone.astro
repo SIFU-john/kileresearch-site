@@ -1,0 +1,26 @@
+---
+// End-of-article CTA zone (KILA-42 doc 2 §12): appears once, after the article. Newsletter
+// first, consulting second. No pop-ups, sticky bars or pre-ticked boxes.
+import NewsletterForm from './forms/NewsletterForm.astro';
+import { serviceById, tagToService, type Service } from '../config/services';
+interface Props { tags?: string[] }
+const { tags = [] } = Astro.props;
+const serviceId = tags.map((t) => tagToService[t]).find(Boolean) as Service['id'] | undefined;
+const related = serviceId ? serviceById[serviceId] : undefined;
+---
+<section class="cta-zone container" aria-label="Keep in touch">
+  <div class="panels">
+    <NewsletterForm idPrefix="nl-end" />
+    <div class="panel" data-surface="ink" role="group" aria-labelledby="cta-consult-title">
+      <p class="overline">For small businesses</p>
+      <h2 id="cta-consult-title">Want this working in your business?</h2>
+      <p>We help small teams adopt AI, run it privately, keep costs down and stay secure.</p>
+      {related && <p><a href={`/consulting/#${related.id}`}>Related service: {related.name} →</a></p>}
+      <p><a class="btn btn-secondary" href="/consulting/">See how we can help</a></p>
+    </div>
+  </div>
+</section>
+<style>
+  [data-surface="ink"].panel { border-radius: var(--radius-lg); }
+  [data-surface="ink"] .overline { color: var(--color-text-muted); }
+</style>
