@@ -14,7 +14,7 @@ import { getArticles } from '../lib/content';
 const articles = await getArticles();
 const fromResearch = [...articles].sort((a, b) => (a.data.level === 'beginner' ? -1 : 0) - (b.data.level === 'beginner' ? -1 : 0) || a.data.date.getTime() - b.data.date.getTime()).slice(0, 3);
 const steps = [
-  ['[Free] intro call', 'A [30-minute] call to understand your business and what you want from AI.'],
+  [`${site.introCallPrice} intro call`, `A ${site.introCallLength} call to understand your business and what you want from AI.`],
   ['Assessment', 'We look at how you work, the data involved and the risks.'],
   ['Plan or build', 'A clear recommendation, or a small working setup, depending on the service.'],
   ['Handover', 'Documentation and training, so your team can run it without us.'],
@@ -35,10 +35,13 @@ const weWont = [
 const faqs = [
   ['Do we need technical staff?', "No. We explain everything in plain language and leave you with documentation your team can follow. If a setup needs ongoing technical care, we'll tell you before you decide and show you what's involved."],
   ['What does it cost?', "It depends on the service and the size of your business. Prices are on request for now. Tell us what you need and we'll send you a clear quote before any work starts."],
-  ['Will our data leave our business?', "Only if you choose a setup that needs it, and we'll explain that before you decide. With a local or private setup, the AI runs on machines you control, so your data isn't sent to a public AI service. During a project we only ask for the data the work needs, and we never use your data to train AI models."],
+  // site-copy v2 (Sentinel review): the stronger wording only appears once the CEO confirms the contract terms.
+  ['Will our data leave our business?', "Only if you choose a setup that needs it, and we'll explain that before you decide. With a local or private setup, the AI runs on machines you control, so the AI doesn't send your data to a public AI service. During a project, we only ask for the data the work needs" + (contentFlags.dataStaysYours
+    ? '. We use it only for your project, never sell or share it, and never use it to train AI models.'
+    : ', and we never use it to train AI models.')],
   ['Which service should we start with?', "If you're not sure, start with the AI adoption assessment. Or just tell us the problem in your own words and we'll suggest where to begin."],
-  ['Do you work remotely?', '[Yes. We work by video call and email.] [On-site visits: whether and where.]'],
-  ['How long does it take?', 'It depends on the service and on what you already have in place. Your quote will include an expected timeline. [Typical length per service]'],
+  ['Do you work remotely?', site.remoteAnswer],
+  ['How long does it take?', `It depends on the service and on what you already have in place. Your quote will include an expected timeline. ${site.timelineNote}`],
 ];
 const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8.5 3 3 7-7"/></svg>';
 ---
@@ -79,8 +82,6 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
             <p><strong>What you get:</strong></p>
             <ul class="list-reset bullets">{s.bullets.map((b) => <li><Fragment set:html={check} /><span>{b.lead && <strong>{b.lead} </strong>}{b.text}</span></li>)}</ul>
           </div>
-          <p class="muted small">Typical length: [TBC]</p>
-          <p class="muted small">Price: On request</p>
           {s.id === 'cost' && <p class="muted small">We never quote example savings. Any numbers come from measuring your own usage.</p>}
           {s.id === 'security' && (
             <>
@@ -96,7 +97,11 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
               </details>
             </>
           )}
-          <p class="push"><a class="btn btn-secondary" href={`/consulting/?service=${s.id}#enquiry`}>Ask about {s.name}</a></p>
+          <div class="card-foot">
+            <p class="muted small">Typical length: {site.typicalLength}</p>
+            <p class="muted small">Price: On request</p>
+            <p><a class="btn btn-secondary" href={`/consulting/?service=${s.id}#enquiry`}>Ask about {s.name}</a></p>
+          </div>
         </li>
       ))}
     </ul>
@@ -137,7 +142,7 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
         <h3 id="next-title">What happens next</h3>
         <ol>
           <li>We read your message and reply within {site.replyDays} working days.</li>
-          <li>If it looks like we can help, we'll suggest a time for a [30-minute] call.</li>
+          <li>If it looks like we can help, we'll suggest a time for a {site.introCallLength} call.</li>
           <li>There's no obligation. If we're not the right fit, we'll say so.</li>
         </ol>
         <p class="muted small">Prefer email? <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
@@ -168,7 +173,10 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
   .bullets :global(svg) { width: 1rem; height: 1rem; margin-top: 0.3em; color: var(--color-success); }
   .x { font-weight: var(--weight-bold); color: var(--color-text-muted); line-height: 1.4; }
   .small { font-size: var(--text-sm); }
-  .push { margin-top: auto; padding-top: var(--space-2); }
+  /* Equal-height cards; the meta + button block sits at the bottom so the four buttons line up (Iris, KILA-44). */
+  .services { align-items: stretch; }
+  .services > li { height: 100%; }
+  .card-foot { margin-top: auto; padding-top: var(--space-2); display: grid; gap: var(--space-2); }
   .service details ul { margin: 0 0 var(--space-2); padding-left: 1.2em; font-size: var(--text-sm); display: grid; gap: var(--space-1); }
   .band { background: var(--color-bg-subtle); border-block: 1px solid var(--color-border); }
   .steps { display: grid; gap: var(--space-6); }

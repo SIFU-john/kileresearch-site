@@ -19,6 +19,12 @@ export const site = {
   newsletterCadence: '[week/month]',
   /** STUB: reply time promised on the enquiry form ("We reply within {n} working days"). */
   replyDays: '[n]',
+  /** STUBs awaiting CEO answers (KILA-44 site-copy, open questions Q3, Q5, Q6). One value each, so they are one-line swaps. */
+  introCallPrice: '[Free]',
+  introCallLength: '[30-minute]',
+  typicalLength: '[TBC]',
+  timelineNote: '[Typical length per service]',
+  remoteAnswer: '[Yes. We work by video call and email.] [On-site visits: whether and where.]',
   /** Optional: Medium profile, shown as "Also on Medium" in the footer. */
   mediumProfile: (env.PUBLIC_MEDIUM_PROFILE as string | undefined) || undefined,
   nav: [
