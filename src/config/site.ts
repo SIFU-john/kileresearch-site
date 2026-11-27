@@ -17,8 +17,7 @@ export const site = {
   contactEmail: (env.PUBLIC_CONTACT_EMAIL as string | undefined) || 'hello@kileresearch.ai',
   /** STUB: newsletter cadence for the sign-up microcopy, to be confirmed by the account owner. */
   newsletterCadence: '[week/month]',
-  /** STUB: reply time promised on the enquiry form ("We reply within {n} working days"). */
-  replyDays: '[n]',
+  replyDays: 3,
   /** STUBs awaiting CEO answers (KILA-44 site-copy, open questions Q3, Q5, Q6). One value each, so they are one-line swaps. */
   introCallPrice: '[Free]',
   introCallLength: '30-minute',
