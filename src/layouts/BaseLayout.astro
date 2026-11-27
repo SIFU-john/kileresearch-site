@@ -23,13 +23,15 @@ interface Props {
   reading?: boolean;
   /** Above-the-fold image to preload ahead of fonts (the page's LCP element). */
   lcpImage?: string | undefined;
+  /** Set false on pages that already show a newsletter panel (one sign-up form per page; axe landmark-unique). */
+  footerNewsletter?: boolean;
   /** Pages with the enquiry form: load Turnstile (only if a site key is configured). */
   enquiry?: boolean;
 }
 
 const {
   title, description = site.description, ogImage = '/og/default.png', ogType = 'website', noindex = false,
-  jsonLd, publishedTime, modifiedTime, reading = false, enquiry = false, lcpImage,
+  jsonLd, publishedTime, modifiedTime, reading = false, enquiry = false, lcpImage, footerNewsletter = true,
 } = Astro.props;
 const canonical = new URL(Astro.props.canonical ?? Astro.url.pathname, Astro.site).href;
 const fullTitle = title === site.name ? `${site.name}: ${site.tagline}` : `${title} · ${site.name}`;
@@ -88,6 +90,6 @@ const { analyticsToken, turnstileSiteKey } = integrations;
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    <Footer newsletter={footerNewsletter} />
   </body>
 </html>

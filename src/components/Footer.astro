@@ -3,6 +3,8 @@ import { site, displayDomain } from '../config/site';
 import { seriesUrl } from '../lib/content';
 import Logo from './Logo.astro';
 import NewsletterForm from './forms/NewsletterForm.astro';
+interface Props { newsletter?: boolean }
+const { newsletter = true } = Astro.props;
 const year = new Date().getFullYear();
 const domain = displayDomain(Astro.site);
 ---
@@ -48,7 +50,7 @@ const domain = displayDomain(Astro.site);
         <li><button type="button" class="linklike" data-theme-reset hidden>Use system theme</button></li>
       </ul>
     </nav>
-    <div class="nl"><NewsletterForm idPrefix="footer-nl" variant="bare" /></div>
+    {newsletter && <div class="nl"><NewsletterForm idPrefix="footer-nl" variant="bare" /></div>}
   </div>
   <div class="container legal">
     <p>© {year} Kile Research · {domain}</p>

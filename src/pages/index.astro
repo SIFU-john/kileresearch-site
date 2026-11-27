@@ -24,8 +24,12 @@ const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: origin, inLanguage: 'en-GB' },
 ];
 ---
-<BaseLayout title={site.name} jsonLd={jsonLd} lcpImage={featured && !featured.data.cover ? coverUrl(featured.id) : undefined}>
-  <h1 class="visually-hidden">Kile Research: practical, reproducible research on how AI models run</h1>
+<BaseLayout title={site.name} jsonLd={jsonLd} footerNewsletter={false} lcpImage={featured && !featured.data.cover ? coverUrl(featured.id) : undefined}>
+  <!-- Intro line (Gate A R5). Placeholder wording: Chris to confirm the final copy. -->
+  <header class="container intro">
+    <h1>Run, measure and understand AI models <em>yourself.</em></h1>
+    <p>Plain-language, reproducible research on LLM inference, with code you can run. <a href="/about/">About us</a></p>
+  </header>
 
   {featured && (
     <section class="container feature-wrap" aria-labelledby="featured-title">
@@ -90,7 +94,12 @@ const jsonLd = [
 </BaseLayout>
 
 <style>
-  .feature-wrap { padding-top: var(--space-10); }
+  .intro { display: grid; gap: var(--space-3); padding-block: var(--space-10) var(--space-2); }
+  .intro h1 { font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.25rem); line-height: 1.1; max-width: 24ch; }
+  .intro em { font-style: italic; font-weight: 500; }
+  .intro p { color: var(--color-text-muted); font-size: var(--text-lg); max-width: 40rem; }
+  .intro a { color: var(--color-text-strong); }
+  .feature-wrap { padding-top: var(--space-8); }
   .feature { position: relative; display: grid; gap: var(--space-6) var(--space-10); align-items: center; }
   .feature .media { aspect-ratio: 13 / 9; }
   @media (min-width: 56rem) { .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }

@@ -3,6 +3,7 @@
 //  - pre-selects the service from ?service={id} (only known option values)
 //  - inline validation with an error summary that receives focus (KILA-32 pattern)
 //  - same-origin posts are sent with fetch; the redirect target decides the message shown
+//  - while errors are shown, the page <title> starts with "Error: " (WCAG 3.3.1, KILA-42 M1)
 
 declare global {
   interface Window { turnstile?: { reset: (el?: Element) => void } }
@@ -26,6 +27,9 @@ function buildMailto(base: string, data: FormData) {
   return `${base}&body=${encodeURIComponent(lines.join('\n'))}`;
 }
 
+const baseTitle = document.title.replace(/^Error: /, '');
+const setErrorTitle = (on: boolean) => { document.title = on ? `Error: ${baseTitle}` : baseTitle; };
+
 for (const root of document.querySelectorAll<HTMLElement>('[data-enquiry]')) {
   const form = root.querySelector('form');
   if (!form) continue;
@@ -42,6 +46,7 @@ for (const root of document.querySelectorAll<HTMLElement>('[data-enquiry]')) {
     const box = root.querySelector<HTMLElement>(`[data-status="${status}"]`);
     if (data) box?.querySelectorAll<HTMLAnchorElement>('[data-mailto-link]').forEach((a) => (a.href = buildMailto(a.href.split('&body=')[0]!, data)));
     if (status === 'success') form.hidden = true;
+    setErrorTitle(status === 'error');
     box?.focus();
   };
 
@@ -71,9 +76,11 @@ for (const root of document.querySelectorAll<HTMLElement>('[data-enquiry]')) {
         }),
       );
       if (summary) { summary.hidden = false; summary.focus(); }
+      setErrorTitle(true);
       return;
     }
     if (summary) summary.hidden = true;
+    setErrorTitle(false);
     if (!form.hasAttribute('data-enhance')) return; // cross-origin provider: let the browser post
 
     event.preventDefault();

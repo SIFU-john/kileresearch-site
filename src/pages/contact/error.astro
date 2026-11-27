@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { site } from '../../config/site';
 const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquiry from the Kile Research website')}`;
 ---
-<BaseLayout title="Your enquiry didn't send" description="Something went wrong sending your enquiry." noindex>
+<BaseLayout title="Error: your enquiry didn't send" description="Something went wrong sending your enquiry." noindex>
   <div class="container section page-prose">
     <h1>Your enquiry didn't send</h1>
     <p>Please check that you filled in your name and a valid email address, and that the message is under 2,000 characters, then <a href="/contact/">try again</a>.</p>
