@@ -3,6 +3,11 @@
 //  - dist/.well-known/security.txt (RFC 9116) from SITE_URL, Expires = build date + 180 days
 import { mkdir, writeFile } from 'node:fs/promises';
 import { renderHeadersFile } from '../config/security-headers.mjs';
+import { reportOnlyRefusal } from '../config/integrations.mjs';
+
+// Never ship a production deploy without an enforced CSP (KILA-43 GB-04).
+const refusal = reportOnlyRefusal();
+if (refusal) throw new Error(`Refusing to build: ${refusal}`);
 
 const file = renderHeadersFile();
 for (const line of file.split('\n')) if (line.length > 2000) throw new Error("_headers line over Cloudflare's 2,000 character limit");

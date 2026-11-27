@@ -1,7 +1,7 @@
 // Tests for functions/api/contact.js (run: npm test). Pure Node, no Cloudflare runtime needed.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { handle, headerSafe, buildMessage, parseFields } from '../functions/api/contact.js';
+import { handle, headerSafe, buildMessage, parseFields, quotedPrintable } from '../functions/api/contact.js';
 
 const ORIGIN = 'https://kileresearch.ai';
 const env = (over = {}) => {
@@ -17,7 +17,7 @@ const env = (over = {}) => {
   };
 };
 class EmailMessage { constructor(from, to, raw) { Object.assign(this, { from, to, raw }); } }
-const okFetch = async () => ({ json: async () => ({ success: true, hostname: 'kileresearch.ai' }) });
+const okFetch = async () => ({ json: async () => ({ success: true, hostname: 'kileresearch.ai', action: 'contact' }) });
 const badFetch = async () => ({ json: async () => ({ success: false }) });
 const valid = { name: 'Ada', email: 'ada@example.com', company: 'Acme', service: 'cost', message: 'Hello\nthere', 'cf-turnstile-response': 'tok' };
 const post = (fields, headers = {}) =>
@@ -98,7 +98,7 @@ test('failed Turnstile -> error, nothing sent', async () => {
 
 test('Turnstile token for another hostname is refused', async () => {
   const e = env();
-  const other = async () => ({ json: async () => ({ success: true, hostname: 'evil.example' }) });
+  const other = async () => ({ json: async () => ({ success: true, hostname: 'evil.example', action: 'contact' }) });
   assert.equal(loc(await handle(post(valid), e, { ...deps, fetch: other })), '/contact/error/?reason=verification');
 });
 
@@ -125,4 +125,44 @@ test('logs contain outcomes only, never personal data', async () => {
   console.log = (s) => lines.push(String(s));
   try { await handle(post(valid), env(), deps); } finally { console.log = orig; }
   assert.deepEqual(lines, ['{"event":"contact_form","outcome":"sent"}']);
+});
+
+test('Turnstile success without a hostname or with the wrong action is refused (GB-02)', async () => {
+  for (const out of [{ success: true, action: 'contact' }, { success: true, hostname: 'kileresearch.ai' }, { success: true, hostname: 'kileresearch.ai', action: 'login' }]) {
+    const e = env();
+    assert.equal(loc(await handle(post(valid), e, { ...deps, fetch: async () => ({ json: async () => out }) })), '/contact/error/?reason=verification');
+    assert.equal(e.sent.length, 0);
+  }
+});
+
+test('a 2000-character single-line message keeps every line within RFC 5322 limits (GB-01)', async () => {
+  const e = env();
+  const message = 'é ' + 'x'.repeat(1990) + ' =end';
+  assert.equal(loc(await handle(post({ ...valid, message }), e, deps)), '/contact/thanks/');
+  const raw = e.sent[0].raw;
+  assert.match(raw, /Content-Transfer-Encoding: quoted-printable\r\n/);
+  for (const line of raw.split('\r\n')) assert.ok(line.length <= 76, `line of ${line.length}`);
+  assert.doesNotMatch(raw, /(?<!\r)\n/, 'bare LF');
+});
+
+test('quoted-printable round-trips UTF-8, "=" and trailing spaces', () => {
+  const text = 'Grüße = 100%  \n' + 'y'.repeat(200) + '\t';
+  const qp = quotedPrintable(text);
+  const decoded = qp.replace(/=\r\n/g, '').split('\r\n').join('\n')
+    .replace(/(?:=[0-9A-F]{2})+/g, (m) => new TextDecoder().decode(Uint8Array.from(m.slice(1).split('=').map((h) => parseInt(h, 16)))));
+  assert.equal(decoded, text);
+  for (const line of qp.split('\r\n')) assert.ok(line.length <= 76);
+  assert.doesNotMatch(qp, /[ \t](?:\r\n|$)/, 'no trailing whitespace on encoded lines');
+});
+
+test('a body over 16 KB with no Content-Length is refused without buffering it all (GB-03)', async () => {
+  const e = env();
+  let pulled = 0;
+  const chunk = new TextEncoder().encode('message=' + 'x'.repeat(4096));
+  const body = new ReadableStream({ pull(c) { pulled++; if (pulled > 100) c.close(); else c.enqueue(chunk); } });
+  const req = new Request('https://kileresearch.ai/api/contact', { method: 'POST', headers: { Origin: ORIGIN, 'Content-Type': 'application/x-www-form-urlencoded' }, body, duplex: 'half' });
+  assert.equal(req.headers.get('Content-Length'), null);
+  assert.equal(loc(await handle(req, e, deps)), '/contact/error/');
+  assert.ok(pulled < 10, `read ${pulled} chunks`);
+  assert.equal(e.sent.length, 0);
 });

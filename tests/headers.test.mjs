@@ -2,6 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderHeadersFile, buildCsp } from '../config/security-headers.mjs';
+import { reportOnlyRefusal } from '../config/integrations.mjs';
 
 const full = {
   PUBLIC_BUTTONDOWN_USERNAME: 'kileresearch',
@@ -47,4 +48,13 @@ test('report-only mode for previews', () => {
 
 test('every _headers line is under the 2,000 character limit', () => {
   for (const line of renderHeadersFile(full).split('\n')) assert.ok(line.length <= 2000);
+});
+
+test('report-only CSP is refused for production builds (GB-04)', () => {
+  const ro = { CSP_MODE: 'report-only' };
+  assert.equal(reportOnlyRefusal({}), null, 'enforce mode is always fine');
+  assert.match(reportOnlyRefusal(ro), /production host/, 'default SITE_URL is the apex');
+  assert.match(reportOnlyRefusal({ ...ro, SITE_URL: 'https://www.kileresearch.ai' }), /production host/);
+  assert.match(reportOnlyRefusal({ ...ro, SITE_URL: 'https://abc.kile-research.pages.dev', CF_PAGES_BRANCH: 'main' }), /production branch/);
+  assert.equal(reportOnlyRefusal({ ...ro, SITE_URL: 'https://abc.kile-research.pages.dev', CF_PAGES_BRANCH: 'feature-x' }), null);
 });

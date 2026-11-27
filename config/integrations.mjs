@@ -41,5 +41,22 @@ export function integrations(env = process.env) {
   return { newsletter, contact, turnstileSiteKey, analyticsToken, cspMode };
 }
 
+/** The live site's host. Builds for it must enforce the CSP. */
+export const PRODUCTION_HOST = 'kileresearch.ai';
+
+/**
+ * KILA-43 GB-04: report-only CSP is for previews only. Returns why it is refused, or null.
+ * A build counts as production when Cloudflare builds the production branch (CF_PAGES_BRANCH,
+ * PRODUCTION_BRANCH defaults to "main") or when SITE_URL is the live apex/www (the default).
+ */
+export function reportOnlyRefusal(env = process.env) {
+  if (integrations(env).cspMode !== 'report-only') return null;
+  const branch = clean(env.CF_PAGES_BRANCH);
+  if (branch && branch === (clean(env.PRODUCTION_BRANCH) ?? 'main')) return `CSP_MODE=report-only on the production branch "${branch}"`;
+  const host = new URL(clean(env.SITE_URL) ?? `https://${PRODUCTION_HOST}`).hostname.replace(/^www\./, '');
+  if (host === PRODUCTION_HOST) return `CSP_MODE=report-only with SITE_URL on the production host ${host} (set SITE_URL to the preview URL)`;
+  return null;
+}
+
 /** Pages that render the enquiry form, so Turnstile's origins are only allowed there. */
 export const enquiryPaths = ['/contact/*', '/consulting/*'];

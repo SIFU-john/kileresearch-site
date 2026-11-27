@@ -54,7 +54,7 @@ const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquir
         <label for={id('website')}>Leave this field empty</label>
         <input id={id('website')} name="website" tabindex="-1" autocomplete="off" />
       </div>
-      {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto" data-size="flexible" data-appearance="interaction-only"></div>}
+      {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-action="contact" data-theme="auto" data-size="flexible" data-appearance="interaction-only"></div>}
       <p class="hint">We'll only use this to reply to you. See our <a href="/privacy/">privacy notice</a>.</p>
       <p><button class="btn btn-primary" type="submit">Send enquiry</button></p>
     </form>

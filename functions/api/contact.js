@@ -25,6 +25,8 @@ const SERVICES = {
 const MAX_BODY = 16 * 1024;
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+/** Must match data-action on the widget in src/components/forms/ContactForm.astro. */
+export const TURNSTILE_ACTION = 'contact';
 
 const BASE_HEADERS = {
   'Cache-Control': 'no-store',
@@ -91,7 +93,7 @@ export function buildMessage({ from, to, data, domain, now = new Date(), id = cr
     `Message-ID: <${id}@${headerSafe(domain)}>`,
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=utf-8',
-    'Content-Transfer-Encoding: 8bit',
+    'Content-Transfer-Encoding: quoted-printable',
   ];
   const body = [
     'New enquiry from the website contact form.',
@@ -107,7 +109,30 @@ export function buildMessage({ from, to, data, domain, now = new Date(), id = cr
     '--',
     'Reply to this email to answer the sender. Delete enquiries in line with the privacy notice.',
   ].join('\n');
-  return headers.join('\r\n') + '\r\n\r\n' + body.replace(/\n/g, '\r\n') + '\r\n';
+  return headers.join('\r\n') + '\r\n\r\n' + quotedPrintable(body) + '\r\n';
+}
+
+/**
+ * RFC 2045 quoted-printable for a UTF-8 text body. Keeps every line at 76 characters or fewer
+ * (RFC 5322 caps lines at 998), however long the visitor's message lines are.
+ */
+export function quotedPrintable(text) {
+  const enc = new TextEncoder();
+  const hex = (b) => '=' + b.toString(16).toUpperCase().padStart(2, '0');
+  return text.split('\n').map((line) => {
+    const bytes = enc.encode(line);
+    const out = [];
+    let cur = '';
+    bytes.forEach((b, i) => {
+      const last = i === bytes.length - 1;
+      const literal = (b >= 33 && b <= 126 && b !== 61) || ((b === 32 || b === 9) && !last);
+      const token = literal ? String.fromCharCode(b) : hex(b);
+      if (cur.length + token.length > 75) { out.push(cur + '='); cur = ''; }
+      cur += token;
+    });
+    out.push(cur);
+    return out.join('\r\n');
+  }).join('\r\n');
 }
 
 async function verifyTurnstile(token, env, ip, fetchImpl, allowedHosts) {
@@ -117,10 +142,30 @@ async function verifyTurnstile(token, env, ip, fetchImpl, allowedHosts) {
   try {
     const res = await fetchImpl(SITEVERIFY, { method: 'POST', body: form });
     const out = await res.json();
-    return out.success === true && (!out.hostname || allowedHosts.has(out.hostname) || [...allowedHosts].some((h) => h.startsWith('.') && out.hostname.endsWith(h)));
+    const host = typeof out.hostname === 'string' ? out.hostname : '';
+    return out.success === true && out.action === TURNSTILE_ACTION && host !== '' && (allowedHosts.has(host) || [...allowedHosts].some((h) => h.startsWith('.') && host.endsWith(h)));
   } catch {
     return false;
   }
+}
+
+/** Read the body as text, stopping as soon as it passes `max` bytes (null if it does). */
+async function readCapped(request, max) {
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) { await reader.cancel().catch(() => {}); return null; }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) { all.set(c, at); at += c.byteLength; }
+  return new TextDecoder().decode(all);
 }
 
 /** Core handler. `deps` lets tests inject fetch and the EmailMessage class. */
@@ -135,8 +180,8 @@ export async function handle(request, env, deps = {}) {
   if (type !== 'application/x-www-form-urlencoded') return redirect('/contact/error/', 'bad_content_type');
   const length = Number(request.headers.get('Content-Length') ?? 0);
   if (length > MAX_BODY) return redirect('/contact/error/', 'too_large');
-  const raw = await request.text();
-  if (raw.length > MAX_BODY) return redirect('/contact/error/', 'too_large');
+  const raw = await readCapped(request, MAX_BODY);
+  if (raw === null) return redirect('/contact/error/', 'too_large');
   const params = new URLSearchParams(raw);
 
   // Honeypot: real people never fill it. Bots get the normal thank-you page.

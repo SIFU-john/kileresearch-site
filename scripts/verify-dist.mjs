@@ -8,6 +8,7 @@
 //  - every migrated article rendered its code blocks and tables
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { reportOnlyRefusal } from '../config/integrations.mjs';
 
 const dist = 'dist';
 const errors = [];
@@ -52,6 +53,10 @@ for (const lic of ['OFL-InstrumentSans.txt', 'OFL-SourceSerif4.txt', 'OFL-JetBra
 
 const headersFile = await readFile(path.join(dist, '_headers'), 'utf8').catch(() => '');
 if (!/Content-Security-Policy(-Report-Only)?: default-src 'none'/.test(headersFile)) errors.push('_headers: missing CSP');
+if (/Content-Security-Policy-Report-Only:/.test(headersFile)) {
+  const refusal = reportOnlyRefusal({ ...process.env, CSP_MODE: 'report-only' });
+  if (refusal) errors.push(`_headers: CSP is report-only but this is a production build (${refusal})`);
+}
 if (/Strict-Transport-Security/i.test(headersFile)) errors.push('_headers: HSTS must be set in the Cloudflare dashboard, not _headers');
 if (!/https:\/\/:project\.pages\.dev\/\*\n  X-Robots-Tag: noindex/.test(headersFile)) errors.push('_headers: missing pages.dev noindex rule');
 if (/unsafe-inline/.test(headersFile)) errors.push("_headers: 'unsafe-inline' is not allowed");
