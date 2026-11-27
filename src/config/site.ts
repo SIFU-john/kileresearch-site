@@ -21,7 +21,8 @@ export const site = {
   replyDays: '[n]',
   /** STUBs awaiting CEO answers (KILA-44 site-copy, open questions Q3, Q5, Q6). One value each, so they are one-line swaps. */
   introCallPrice: '[Free]',
-  introCallLength: '[30-minute]',
+  introCallLength: '30-minute',
+  introCallUrl: 'https://calendly.com/yeancahfk/30min',
   typicalLength: '[TBC]',
   timelineNote: '[Typical length per service]',
   remoteAnswer: '[Yes. We work by video call and email.] [On-site visits: whether and where.]',

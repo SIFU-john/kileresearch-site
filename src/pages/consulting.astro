@@ -14,11 +14,11 @@ import { getArticles } from '../lib/content';
 const articles = await getArticles();
 const fromResearch = [...articles].sort((a, b) => (a.data.level === 'beginner' ? -1 : 0) - (b.data.level === 'beginner' ? -1 : 0) || a.data.date.getTime() - b.data.date.getTime()).slice(0, 3);
 const steps = [
-  [`${site.introCallPrice} intro call`, `A ${site.introCallLength} call to understand your business and what you want from AI.`],
+  [`${site.introCallPrice} intro call`, `A ${site.introCallLength} call to understand your business and what you want from AI.`, site.introCallUrl],
   ['Assessment', 'We look at how you work, the data involved and the risks.'],
   ['Plan or build', 'A clear recommendation, or a small working setup, depending on the service.'],
   ['Handover', 'Documentation and training, so your team can run it without us.'],
-];
+] as const;
 const weWill = [
   ...(contentFlags.dataStaysYours ? ["Your data stays yours. We use it only for your project, never sell or share it, and return or delete it when we're done."] : []),
   'We never use your data to train AI models.',
@@ -110,7 +110,18 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
   <section class="band" id="process" aria-labelledby="process-title">
     <div class="container section-tight">
       <h2 id="process-title">How it works</h2>
-      <ol class="list-reset steps">{steps.map(([t, b], i) => <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p class="muted">{b}</p></div></li>)}</ol>
+      <ol class="list-reset steps">
+        {steps.map(([title, description, bookingUrl], i) => (
+          <li>
+            <span class="n" aria-hidden="true">{i + 1}</span>
+            <div>
+              <h3>{title}</h3>
+              <p class="muted">{description}</p>
+              {bookingUrl && <p><a href={bookingUrl}>Book an intro call</a></p>}
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
