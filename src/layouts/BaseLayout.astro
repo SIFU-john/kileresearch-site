@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/editorial.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../config/site';
@@ -20,13 +21,15 @@ interface Props {
   modifiedTime?: Date | undefined;
   /** Article pages: preload the reading serif and show the reading-progress bar. */
   reading?: boolean;
+  /** Above-the-fold image to preload ahead of fonts (the page's LCP element). */
+  lcpImage?: string | undefined;
   /** Pages with the enquiry form: load Turnstile (only if a site key is configured). */
   enquiry?: boolean;
 }
 
 const {
   title, description = site.description, ogImage = '/og/default.png', ogType = 'website', noindex = false,
-  jsonLd, publishedTime, modifiedTime, reading = false, enquiry = false,
+  jsonLd, publishedTime, modifiedTime, reading = false, enquiry = false, lcpImage,
 } = Astro.props;
 const canonical = new URL(Astro.props.canonical ?? Astro.url.pathname, Astro.site).href;
 const fullTitle = title === site.name ? `${site.name}: ${site.tagline}` : `${title} · ${site.name}`;
@@ -48,13 +51,15 @@ const { analyticsToken, turnstileSiteKey } = integrations;
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#FAF9F6" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0E0E" media="(prefers-color-scheme: dark)" />
     <!-- Same-origin, blocking and tiny: applies a stored theme choice before first paint. -->
     <script is:inline src="/theme.js"></script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {lcpImage && <link rel="preload" href={lcpImage} as="image" fetchpriority="high" />}
     <link rel="preload" href={fonts.sans} as="font" type="font/woff2" crossorigin />
-    {reading && <link rel="preload" href={fonts.serif} as="font" type="font/woff2" crossorigin />}
+    <!-- The serif sets every headline now, so preload it on all pages. -->
+    <link rel="preload" href={fonts.serif} as="font" type="font/woff2" crossorigin />
     <link rel="alternate" type="application/rss+xml" title={`${site.name} RSS`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 

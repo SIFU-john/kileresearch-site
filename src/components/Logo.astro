@@ -1,24 +1,20 @@
 ---
-// Kile Research lock-up (KILA-42 brand-application, DRAFT mark v0.1). The mark inherits
-// currentColor; the words are real text but aria-hidden, because the home link carries
-// the accessible name "Kile Research home".
+// Kile Research lock-up (KILA-42 brand-application, DRAFT mark v0.1), editorial version: the
+// wordmark is set in the reading serif. The mark inherits currentColor; the words are real text
+// but aria-hidden, because the home link carries the accessible name "Kile Research home".
 ---
 <span class="logo">
-  <svg class="mark" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">
+  <svg class="mark" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true" focusable="false">
     <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="currentColor" stroke-width="2"></rect>
     <path d="M7 20 H14 M18 20 L22 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path>
     <circle class="dot" cx="24" cy="10.5" r="2.25" fill="currentColor"></circle>
   </svg>
-  <span class="wordmark" aria-hidden="true"><span class="kile">Kile</span> <span class="research">Research</span></span>
+  <span class="wordmark" aria-hidden="true">Kile Research</span>
 </span>
 
 <style>
-  .logo { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-text-strong); }
+  .logo { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--color-text-strong); }
   .mark { flex: none; }
-  .wordmark { font-size: 1.25rem; letter-spacing: -0.02em; line-height: 1; white-space: nowrap; }
-  .kile { font-weight: var(--weight-semibold); color: var(--color-text-strong); }
-  .research { font-weight: var(--weight-regular); color: var(--color-text-muted); }
-  .dot { stroke: transparent; stroke-width: 1; transition: stroke var(--duration-base) var(--ease-standard); }
-  :global(a:is(:hover, :focus-visible)) > .logo .dot { stroke: var(--color-accent); }
-  @media (max-width: 30rem) { .wordmark { font-size: 1.125rem; } }
+  .wordmark { font-family: var(--font-serif); font-weight: 600; font-size: 1.5rem; letter-spacing: -0.025em; line-height: 1; white-space: nowrap; }
+  @media (max-width: 30rem) { .wordmark { font-size: 1.3125rem; } }
 </style>

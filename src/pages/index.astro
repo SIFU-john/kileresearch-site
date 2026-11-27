@@ -1,160 +1,130 @@
 ---
-// Home (KILA-42 page-layouts §A). Copy in quotes in the spec is placeholder for Chris.
+// Home, editorial layout (KILA-41 redesign; reference: Noter). Featured story, a row of cover
+// tiles, then the reading list with a sidebar (who we are, newsletter, consulting).
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import ArticleRow from '../components/ArticleRow.astro';
+import Cover from '../components/Cover.astro';
 import NewsletterForm from '../components/forms/NewsletterForm.astro';
 import { site } from '../config/site';
 import { services } from '../config/services';
+import { coverUrl } from '../lib/cover';
 import { getArticles, articleUrl, formatDate, levelLabel, readingMinutes, seriesUrl } from '../lib/content';
 
 const articles = await getArticles();
 const [featured, ...rest] = articles;
-const latest = rest.slice(0, 3);
-const seriesNames = [...new Set(articles.flatMap((a) => (a.data.series ? [a.data.series.name] : [])))];
-const series = seriesNames.map((name) => {
-  const parts = articles.filter((a) => a.data.series?.name === name).sort((a, b) => a.data.series!.part - b.data.series!.part);
-  return { name, parts };
-});
-const firstArticle = series[0]?.parts[0] ?? articles.at(-1);
+const tiles = rest.slice(0, 3);
+const seriesName = articles.find((a) => a.data.series)?.data.series?.name;
+const seriesParts = seriesName
+  ? articles.filter((a) => a.data.series?.name === seriesName).sort((a, b) => a.data.series!.part - b.data.series!.part)
+  : articles;
 const origin = new URL('/', Astro.site).href;
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'Organization', name: site.name, url: origin, logo: new URL('/favicon.svg', Astro.site).href, sameAs: [site.codeRepo] },
   { '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: origin, inLanguage: 'en-GB' },
 ];
 ---
-<BaseLayout title={site.name} jsonLd={jsonLd}>
-  <section class="hero container" aria-labelledby="hero-title">
-    <div class="hero-text">
-      <p class="overline">Kile Research</p>
-      <h1 id="hero-title">Run, measure and understand AI models yourself.</h1>
-      <p class="lead">Plain-language, reproducible write-ups on LLM inference, with code you can run.</p>
-      <p class="actions">
-        {firstArticle && <a class="btn btn-primary" href={articleUrl(firstArticle)}>Start with the basics</a>}
-        <a href="/research/">Browse all research →</a>
-      </p>
-    </div>
-    <div class="hero-figure" aria-hidden="true">
-      <div class="nb">
-        <div class="nb-head mono">benchmark.py</div>
-        <pre class="nb-code"><code>    start <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">perf_counter</span><span class="token punctuation">()</span>
-    ttft <span class="token operator">=</span> <span class="token constant">None</span>
-<span class="token comment">    # ...stream the reply...</span>
-    ttft <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">perf_counter</span><span class="token punctuation">()</span> <span class="token operator">-</span> start</code></pre>
-        <svg class="nb-chart" viewBox="0 0 320 96" fill="none">
-          <path class="axis" d="M8 88 H312" />
-          <path class="line" d="M8 70 H120 M150 70 L200 34" />
-          <circle class="point" cx="212" cy="26" r="6" />
-        </svg>
-      </div>
-    </div>
-  </section>
+<BaseLayout title={site.name} jsonLd={jsonLd} lcpImage={featured && !featured.data.cover ? coverUrl(featured.id) : undefined}>
+  <h1 class="visually-hidden">Kile Research: practical, reproducible research on how AI models run</h1>
 
   {featured && (
-    <section class="container section-tight" aria-labelledby="latest-title">
-      <div class="section-head">
-        <h2 id="latest-title">Latest research</h2>
-        <a href="/research/">View all →</a>
-      </div>
-      <div class="latest">
-        <ArticleCard article={featured} featured />
-        {latest.length > 0 && (
-          <ol class="list-reset rows">
-            {latest.map((a) => (
-              <li class="row-item">
-                <time class="mono muted" datetime={a.data.date.toISOString()}>{formatDate(a.data.date)}</time>
-                <h3><a class="stretched" href={articleUrl(a)}>{a.data.title}</a></h3>
-                <p class="muted small">{readingMinutes(a)} min read{a.data.level && ` · ${levelLabel(a.data.level)}`}</p>
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
-    </section>
-  )}
-
-  {series.length > 0 && (
-    <section class="container section-tight" aria-labelledby="series-title">
-      <h2 id="series-title">Start here</h2>
-      {series.map((s) => (
-        <div class="card series-card">
-          <p class="overline">Series · {s.parts.length} parts</p>
-          <h3><a href={seriesUrl(s.name)}>{s.name}</a></h3>
-          <ol class="parts">{s.parts.map((p) => <li><a href={articleUrl(p)}>{p.data.title}</a></li>)}</ol>
+    <section class="container feature-wrap" aria-labelledby="featured-title">
+      <article class="feature">
+        <div class="media"><Cover article={featured} eager sizes="(min-width: 64rem) 50vw, 100vw" /></div>
+        <div class="feature-text">
+          <p class="overline">Latest{featured.data.series && ` · ${featured.data.series.name} · Part ${featured.data.series.part}`}</p>
+          <h2 id="featured-title"><a class="stretched" href={articleUrl(featured)}>{featured.data.title}</a></h2>
+          <p class="desc">{featured.data.description}</p>
+          <p class="meta-line">
+            <time datetime={featured.data.date.toISOString()}>{formatDate(featured.data.date)}</time>
+            <span aria-hidden="true"> · </span>{readingMinutes(featured)} min read{featured.data.level && <> · {levelLabel(featured.data.level)}</>}
+          </p>
         </div>
-      ))}
+      </article>
     </section>
   )}
 
-  <section class="container section-tight" aria-labelledby="how-title">
-    <h2 id="how-title">How we write</h2>
-    <ul class="list-reset trust">
-      <li><p class="overline">Reproducible</p><p>Every article links to its code.</p>{featured?.data.repoPath && <a href={`${articleUrl(featured)}#repro-title`}>See an example →</a>}</li>
-      <li><p class="overline">Honest about limits</p><p>We say what we tested on.</p><a href="/about/">How we work →</a></li>
-      <li><p class="overline">For learners</p><p>Beginner and intermediate levels.</p><a href="/research/">Browse by topic →</a></li>
-    </ul>
-  </section>
+  {tiles.length > 0 && (
+    <section class="container" aria-labelledby="more-title">
+      <h2 id="more-title" class="visually-hidden">More research</h2>
+      <ul class="list-reset tiles">{tiles.map((a) => <li><ArticleCard article={a} /></li>)}</ul>
+    </section>
+  )}
 
-  <section class="teaser" data-surface="ink" aria-labelledby="teaser-title">
-    <div class="container teaser-inner">
-      <div>
-        <p class="overline">For small businesses</p>
-        <h2 id="teaser-title">Thinking about AI for your business?</h2>
-        <p class="muted">We help small teams work out where AI helps, run it privately and affordably, and keep it secure.</p>
+  <div class="container split">
+    <section class="reading" aria-labelledby="start-title">
+      <div class="section-label">
+        <h2 id="start-title" class="overline">Start here{seriesName && `: ${seriesName}`}</h2>
+        <a class="text-more" href={seriesName ? seriesUrl(seriesName) : '/research/'}>View series<span class="visually-hidden">: {seriesName}</span></a>
       </div>
-      <div>
-        <ul class="list-reset svc">{services.map((s) => <li><a href={`/consulting/#${s.id}`}>{s.name}</a></li>)}</ul>
-        <p><a class="btn btn-secondary" href="/consulting/">See how we can help</a></p>
-      </div>
-    </div>
-  </section>
+      <ol class="list-reset posts">{seriesParts.map((a) => <li><ArticleRow article={a} showTags={false} /></li>)}</ol>
+      <a class="btn btn-secondary btn-block" href="/research/">All research</a>
+    </section>
 
-  <section class="container nl"><NewsletterForm /></section>
+    <aside class="sidebar" aria-label="About Kile Research">
+      <section class="panel panel-subtle welcome" aria-labelledby="welcome-title">
+        <h2 id="welcome-title">Welcome to Kile Research</h2>
+        <div class="who">
+          <span class="avatar" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="30" height="30" focusable="false"><path d="M7 20 H14 M18 20 L22 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path><circle cx="24" cy="10.5" r="2.25" fill="currentColor"></circle></svg>
+          </span>
+          <p class="who-name">Run, measure and understand AI models yourself.</p>
+        </div>
+        <p>Plain-language, reproducible write-ups on LLM inference for beginner and intermediate readers. Every article links to code you can run.</p>
+        <a class="text-more" href="/about/">Read more<span class="visually-hidden"> about Kile Research</span></a>
+      </section>
+
+      <NewsletterForm idPrefix="home-nl" />
+
+      <section class="promo" aria-labelledby="promo-title">
+        <div class="media"><Cover slug="consulting" sizes="(min-width: 64rem) 25vw, 100vw" /></div>
+        <div class="glass">
+          <p class="overline">For small businesses</p>
+          <h2 id="promo-title">Thinking about AI for your business?</h2>
+          <ul class="list-reset svc">{services.map((s) => <li><a href={`/consulting/#${s.id}`}>{s.name}</a></li>)}</ul>
+          <a class="btn btn-primary btn-block" href="/consulting/">See how we can help</a>
+        </div>
+      </section>
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
-  .hero { display: grid; gap: var(--space-10); align-items: center; padding-block: var(--space-section) var(--space-16); }
-  .hero-text { max-width: 40rem; display: grid; gap: var(--space-5); }
-  .hero h1 { font-size: var(--text-4xl); max-width: 18ch; }
-  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
-  .actions > a:not(.btn) { min-height: var(--target-min); display: inline-flex; align-items: center; }
-  .hero-figure { display: none; }
-  @media (min-width: 64rem) {
-    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 28rem); }
-    .hero-figure { display: block; }
+  .feature-wrap { padding-top: var(--space-10); }
+  .feature { position: relative; display: grid; gap: var(--space-6) var(--space-10); align-items: center; }
+  .feature .media { aspect-ratio: 13 / 9; }
+  @media (min-width: 56rem) { .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+  .feature-text { display: grid; gap: var(--space-4); max-width: 36rem; }
+  .feature h2 { font-size: clamp(2rem, 1.4rem + 2.2vw, 3rem); line-height: 1.12; }
+  .feature .desc { font-size: var(--text-lg); color: var(--color-text-muted); display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .meta-line { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+  .tiles { display: grid; gap: var(--space-6); margin-top: var(--space-10); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+
+  .split { display: grid; gap: var(--space-12) var(--space-10); margin-top: var(--space-16); align-items: start; }
+  @media (min-width: 64rem) { .split { grid-template-columns: minmax(0, 1fr) minmax(0, 24rem); } }
+  .section-label { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+  .section-label .overline { font-family: var(--font-mono); font-size: 0.875rem; }
+  .text-more {
+    display: inline-flex; align-items: center; min-height: var(--target-min); font-size: 0.875rem; font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-strong); text-decoration: none; white-space: nowrap;
   }
-  .nb { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: var(--radius-lg); overflow: hidden; color: var(--code-fg); }
-  .nb-head { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-overline); color: var(--code-comment); padding: var(--space-3) var(--space-5); border-bottom: 1px solid var(--code-border); }
-  .nb-code { margin: 0; padding: var(--space-4) var(--space-5); font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.7; overflow: hidden; }
-  .nb-chart { width: 100%; height: auto; padding: 0 var(--space-5) var(--space-4); }
-  .nb-chart .axis { stroke: var(--code-border); stroke-width: 2; }
-  .nb-chart .line { stroke: var(--color-accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 260; stroke-dashoffset: 0; }
-  .nb-chart .point { fill: var(--color-accent); }
-  @media (prefers-reduced-motion: no-preference) {
-    .nb-chart .line { animation: draw var(--duration-reveal) var(--ease-enter) both 200ms; }
-    @keyframes draw { from { stroke-dashoffset: 260; } }
-  }
-  .section-tight { padding-block: var(--space-12); }
-  .section-tight > h2 { margin-bottom: var(--space-6); }
-  .latest { display: grid; gap: var(--space-6); }
-  @media (min-width: 64rem) { .latest { grid-template-columns: 3fr 2fr; } }
-  .rows { border-top: 1px solid var(--color-rule); }
-  .row-item { position: relative; padding-block: var(--space-4); border-bottom: 1px solid var(--color-rule); display: grid; gap: var(--space-1); }
-  .row-item time, .small { font-size: var(--text-sm); }
-  .row-item h3 { font-size: var(--text-lg); }
-  .series-card { max-width: 52rem; }
-  .series-card h3 { font-size: var(--text-2xl); }
-  .parts { margin: 0; padding-left: 1.4em; display: grid; gap: var(--space-2); }
-  .parts a { min-height: var(--target-min); display: inline-flex; align-items: center; }
-  .trust { display: grid; gap: var(--space-6); }
-  @media (min-width: 48rem) { .trust { grid-template-columns: repeat(3, 1fr); } }
-  .trust li { display: grid; gap: var(--space-2); align-content: start; }
-  .trust p:not(.overline) { font-family: var(--font-reading); font-size: var(--text-lg); color: var(--color-read-text); }
-  .teaser { padding-block: var(--space-16); margin-top: var(--space-12); }
-  .teaser-inner { display: grid; gap: var(--space-8); }
-  @media (min-width: 64rem) { .teaser-inner { grid-template-columns: 1fr 1fr; align-items: center; } }
-  .teaser h2 { margin-block: var(--space-3); }
-  .teaser .overline { color: var(--color-text-muted); }
-  .svc { display: grid; gap: var(--space-1); margin-bottom: var(--space-6); }
-  .svc a { min-height: var(--target-min); display: inline-flex; align-items: center; font-size: var(--text-lg); }
-  .nl { margin-top: var(--space-section); max-width: 44rem; }
+  .text-more:hover { text-decoration: underline; }
+  .posts { display: grid; gap: var(--space-8); margin-bottom: var(--space-10); }
+
+  .sidebar { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .sidebar { position: sticky; top: calc(var(--header-height) + var(--space-6)); } }
+  .welcome { padding: var(--space-8) var(--space-6); }
+  .welcome h2 { font-family: var(--font-mono); font-size: 0.875rem; letter-spacing: var(--tracking-label); text-transform: uppercase; font-weight: 400; }
+  .who { display: flex; align-items: center; gap: var(--space-4); }
+  .avatar { flex: none; display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 50%; background: var(--color-accent); color: var(--color-on-accent); }
+  .who-name { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; line-height: 1.3; color: var(--color-text-strong); }
+
+  .promo { position: relative; border-radius: var(--radius-card); overflow: hidden; isolation: isolate; padding: var(--space-4); min-height: 26rem; display: flex; align-items: flex-end; }
+  .promo .media { position: absolute; inset: 0; z-index: -1; border-radius: 0; }
+  .promo .glass { width: 100%; padding: var(--space-6); background: var(--glass); color: var(--glass-text); border-radius: var(--radius-inner); display: grid; gap: var(--space-3); }
+  @supports (backdrop-filter: blur(1px)) { .promo .glass { backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); } }
+  .promo h2 { font-size: 1.5rem; line-height: 1.2; color: var(--glass-text); }
+  .promo .overline { color: var(--glass-text); }
+  .svc a { display: inline-flex; align-items: center; min-height: var(--target-min); color: var(--glass-text); }
 </style>

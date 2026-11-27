@@ -24,6 +24,6 @@ const { all, tag, items } = Astro.props;
 <style>
   .crumb { font-size: var(--text-sm); color: var(--color-text-muted); }
   .crumb a { color: inherit; }
-  h1 { text-transform: capitalize; margin-block: var(--space-3); }
-  .list { margin-top: var(--space-6); border-top: 1px solid var(--color-rule); max-width: 52rem; }
+  h1 { text-transform: capitalize; margin-block: var(--space-3); font-size: clamp(2.5rem, 1.8rem + 3vw, 4rem); line-height: 1.05; }
+  .list { display: grid; gap: var(--space-10); margin-top: var(--space-10); max-width: 60rem; }
 </style>

@@ -3,16 +3,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleRow from '../../components/ArticleRow.astro';
 import Search from '../../components/Search.astro';
 import FilterNav from '../../components/FilterNav.astro';
-import NewsletterForm from '../../components/forms/NewsletterForm.astro';
 import { getArticles } from '../../lib/content';
 const articles = await getArticles();
 ---
 <BaseLayout title="Research" description="Every Kile Research article, newest first: plain-language, reproducible write-ups on AI and LLM inference, with code you can run.">
-  <div class="container section">
+  <div class="container page">
     <header class="head">
+      <p class="overline">{articles.length} articles · <a href="/rss.xml">RSS</a></p>
       <h1>Research</h1>
-      <p class="lead">All our write-ups, newest first.</p>
-      <p class="muted count">{articles.length} articles · <a href="/rss.xml">Subscribe via RSS</a></p>
+      <p class="lead">Plain-language, reproducible write-ups on running and measuring AI models. Newest first.</p>
     </header>
     <Search />
     <FilterNav articles={articles} />
@@ -21,11 +20,12 @@ const articles = await getArticles();
       <ol class="list-reset list" reversed>{articles.map((a) => <li><ArticleRow article={a} /></li>)}</ol>
     </div>
   </div>
-  <div class="container nl"><NewsletterForm /></div>
 </BaseLayout>
 <style>
-  .head { display: grid; gap: var(--space-3); }
-  .count { font-size: var(--text-sm); }
-  .list { margin-top: var(--space-6); border-top: 1px solid var(--color-rule); max-width: 52rem; }
-  .nl { max-width: 40rem; }
+  .page { padding-top: var(--space-12); }
+  .head { display: grid; gap: var(--space-4); max-width: 46rem; margin-bottom: var(--space-8); }
+  .head h1 { font-size: clamp(2.75rem, 1.8rem + 4vw, 4.5rem); line-height: 1; }
+  .head .overline a { color: inherit; }
+  .lead { font-size: var(--text-lg); max-width: 38rem; }
+  .list { display: grid; gap: var(--space-10); margin-top: var(--space-10); max-width: 60rem; }
 </style>

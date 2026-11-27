@@ -6,6 +6,8 @@ import Toc from '../../components/Toc.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import Reproduce from '../../components/Reproduce.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import Cover from '../../components/Cover.astro';
+import { coverUrl } from '../../lib/cover';
 import CtaZone from '../../components/CtaZone.astro';
 import { authors } from '../../config/authors';
 import { site, repoUrl } from '../../config/site';
@@ -64,6 +66,7 @@ const jsonLd = {
   publishedTime={d.date}
   modifiedTime={d.updated}
   reading
+  lcpImage={d.cover ? undefined : coverUrl(article.id)}
 >
   <div class="article-shell">
     <article aria-labelledby="article-title">
@@ -90,6 +93,7 @@ const jsonLd = {
             {d.mediumUrl && <><span aria-hidden="true">·</span><a href={d.mediumUrl}>Also on Medium<span class="visually-hidden"> (opens external site)</span></a></>}
           </p>
         </div>
+        <div class="article-cover wide"><Cover article={article} eager sizes="(min-width: 52rem) 52rem, 100vw" /></div>
         {d.repoPath && <Reproduce repoPath={d.repoPath} variant="strip" />}
         <Toc headings={headings} variant="inline" />
       </header>
@@ -121,7 +125,7 @@ const jsonLd = {
   {related.length > 0 && (
     <section class="container related" aria-labelledby="related-title">
       <h2 id="related-title">Related research</h2>
-      <div class="grid">{related.map((a) => <ArticleCard article={a} />)}</div>
+      <ul class="list-reset related-grid">{related.map((a) => <li><ArticleCard article={a} /></li>)}</ul>
     </section>
   )}
 </BaseLayout>

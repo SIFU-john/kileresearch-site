@@ -1,33 +1,33 @@
 ---
-// Research index list item (KILA-42 page-layouts §B4). The title is the only link
-// (stretched); tag links are raised above it.
+// Editorial list item: thumbnail left, label / title / description / meta right. The title is
+// the only link (stretched); tag links are raised above it.
+import Cover from './Cover.astro';
 import { articleUrl, formatDate, levelLabel, readingMinutes, tagLabel, tagUrl, type Article } from '../lib/content';
-interface Props { article: Article; headingLevel?: 'h2' | 'h3' }
-const { article, headingLevel = 'h3' } = Astro.props;
+interface Props { article: Article; headingLevel?: 'h2' | 'h3'; showTags?: boolean }
+const { article, headingLevel = 'h3', showTags = true } = Astro.props;
 const { title, description, date, series, tags, level, draft } = article.data;
 const H = headingLevel;
 ---
-<article class="row-item">
-  <div class="top">
-    <time class="mono muted" datetime={date.toISOString()}>{formatDate(date)}</time>
-    {series && <span class="overline">{series.name} · Part {series.part}</span>}
-    {draft && <span class="overline">Draft</span>}
+<article class="post">
+  <div class="media"><Cover article={article} sizes="(min-width: 40rem) 13rem, 100vw" /></div>
+  <div class="body">
+    <p class="overline">{series ? `${series.name} · Part ${series.part}` : tagLabel(tags[0] ?? 'research')}{draft && ' · Draft'}</p>
+    <H><a class="stretched" href={articleUrl(article)}>{title}</a></H>
+    <p class="desc">{description}</p>
+    <p class="meta-line">
+      <time datetime={date.toISOString()}>{formatDate(date)}</time>
+      <span aria-hidden="true"> · </span>{readingMinutes(article)} min read{level && <> · {levelLabel(level)}</>}
+    </p>
+    {showTags && (
+      <p class="tag-line">
+        <span class="visually-hidden">Topics: </span>
+        {tags.map((t) => <a class="tag raise" href={tagUrl(t)}>#{tagLabel(t)}</a>)}
+      </p>
+    )}
   </div>
-  <H class="title"><a class="stretched" href={articleUrl(article)}>{title}</a></H>
-  <p class="desc">{description}</p>
-  <p class="meta">
-    {readingMinutes(article)} min read{level && <> · {levelLabel(level)}</>}
-    <span aria-hidden="true"> · </span>
-    <span class="visually-hidden">Topics: </span>
-    {tags.map((t) => <a class="tag raise" href={tagUrl(t)}>#{tagLabel(t)}</a>)}
-  </p>
 </article>
 
 <style>
-  .row-item { position: relative; display: grid; gap: var(--space-2); padding-block: var(--space-6); border-bottom: 1px solid var(--color-rule); }
-  .top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2) var(--space-4); font-size: var(--text-sm); }
-  .title { font-size: var(--text-xl); }
-  .desc { font-family: var(--font-reading); color: var(--color-read-muted); max-width: 68ch; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); font-size: var(--text-sm); color: var(--color-text-muted); }
-  .meta .tag { min-height: var(--target-min); }
+  .tag-line { display: flex; flex-wrap: wrap; gap: 0 var(--space-3); }
+  .tag-line .tag { min-height: var(--target-min); }
 </style>

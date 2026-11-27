@@ -3,10 +3,12 @@
 //   - applies simple rules from dist/_redirects
 //   - POST /api/contact answers like the unconfigured Pages Function (303 -> /contact/unavailable/),
 //     because Functions don't run here. Use `npx wrangler pages dev dist` to run the real Function.
+//   - gzips text responses, as Cloudflare does, so local Lighthouse numbers match production
 // `npm run preview` -> http://localhost:4322
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 const root = path.resolve('dist');
 const port = Number(process.env.PORT ?? 4322);
@@ -91,11 +93,15 @@ createServer(async (req, res) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405, { Allow: 'GET, HEAD' }); return res.end(); }
   const file = await resolve(urlPath);
   const target = file ?? path.join(root, '404.html');
-  const body = await readFile(target);
+  let body = await readFile(target);
+  const type = types[path.extname(target)] ?? 'application/octet-stream';
+  const gzip = /^(text\/|application\/(json|xml|manifest)|image\/svg)/.test(type) && /\bgzip\b/.test(req.headers['accept-encoding'] ?? '');
+  if (gzip) body = gzipSync(body);
   res.writeHead(file ? 200 : 404, {
     'Cache-Control': 'public, max-age=0, must-revalidate',
     ...headersFor(headerRules, file ? urlPath : '/404.html'),
-    'Content-Type': types[path.extname(target)] ?? 'application/octet-stream',
+    'Content-Type': type,
+    ...(gzip && { 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' }),
   });
   res.end(req.method === 'HEAD' ? undefined : body);
 }).listen(port, () => console.log(`serving dist/ with dist/_headers on http://localhost:${port}`));

@@ -1,24 +1,18 @@
 ---
-// KILA-32 content card: overline, title (the one link, stretched), 2-line description,
-// reading time and level.
-import { articleUrl, levelLabel, readingMinutes, type Article } from '../lib/content';
-interface Props { article: Article; headingLevel?: 'h2' | 'h3'; featured?: boolean }
-const { article, headingLevel = 'h3', featured = false } = Astro.props;
-const { title, description, series, level, draft } = article.data;
+// Editorial tile: full-bleed cover with a frosted caption (label + title). The title is the
+// card's only link (stretched over the whole tile).
+import Cover from './Cover.astro';
+import { articleUrl, type Article } from '../lib/content';
+interface Props { article: Article; headingLevel?: 'h2' | 'h3' }
+const { article, headingLevel = 'h3' } = Astro.props;
+const { title, series, tags, draft } = article.data;
 const H = headingLevel;
+const label = series ? `${series.name.replace(/^Beginner's Guide to /, '')} · Part ${series.part}` : tags[0]?.replace(/-/g, ' ') ?? 'Research';
 ---
-<article class:list={['card', 'article-card', { featured }]}>
-  <p class="overline">{series ? `${series.name} · Part ${series.part}` : 'Research'}{draft && ' · Draft'}</p>
-  <H class="title"><a class="stretched" href={articleUrl(article)}>{title}</a></H>
-  <p class="desc">{description}</p>
-  <p class="meta">{readingMinutes(article)} min read{level && <> · {levelLabel(level)}</>}</p>
+<article class="tile">
+  <div class="media"><Cover article={article} sizes="(min-width: 64rem) 33vw, 100vw" /></div>
+  <div class="glass">
+    <p class="overline">{label}{draft && ' · Draft'}</p>
+    <H><a class="stretched" href={articleUrl(article)}>{title}</a></H>
+  </div>
 </article>
-
-<style>
-  .title { font-size: var(--text-xl); }
-  .featured { padding: var(--space-8); }
-  .featured .title { font-size: var(--text-3xl); }
-  .desc { flex: 1; font-family: var(--font-reading); color: var(--color-read-muted); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .featured .desc { -webkit-line-clamp: 3; line-clamp: 3; font-size: var(--text-lede); }
-  .meta { font-size: var(--text-sm); color: var(--color-text-muted); }
-</style>

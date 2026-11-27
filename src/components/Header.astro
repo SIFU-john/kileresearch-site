@@ -1,4 +1,6 @@
 ---
+// Editorial header: mono nav left, centred wordmark, tools right (desktop). Below lg the
+// wordmark sits left with the tools, and the nav wraps to its own row (no JS menu).
 import Logo from './Logo.astro';
 import { site } from '../config/site';
 interface Props { progress?: boolean }
@@ -17,14 +19,14 @@ const path = Astro.url.pathname;
       </ul>
     </nav>
     <div class="tools">
+      <a class="text-link contact" href="/contact/" aria-current={path.startsWith('/contact/') ? 'page' : undefined}>Contact</a>
       <button type="button" class="btn btn-icon icon-btn theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Dark theme" title="Dark theme" hidden>
-        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
-        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
       </button>
       <a class="btn btn-icon icon-btn" href="/research/#search" aria-label="Search research" title="Search research">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
       </a>
-      <a class="btn btn-secondary cta" href="/consulting/">Work with us</a>
     </div>
   </div>
 </header>
@@ -32,25 +34,35 @@ const path = Astro.url.pathname;
 <style>
   .site-header { position: relative; border-bottom: 1px solid var(--color-border); background: var(--color-page); z-index: var(--z-header); }
   @media (min-width: 48rem) { .site-header { position: sticky; top: 0; } }
-  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); min-height: var(--header-height); padding-block: var(--space-2); }
-  .home { text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; margin-right: auto; }
-  .main-nav { order: 3; flex-basis: 100%; }
-  @media (min-width: 48rem) { .main-nav { order: 0; flex-basis: auto; } }
-  .main-nav ul { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-  .main-nav a {
-    display: inline-flex; align-items: center; min-height: var(--target-min); padding-inline: var(--space-3);
-    color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); border-radius: var(--radius-md);
+  @supports (backdrop-filter: blur(1px)) {
+    @media (min-width: 48rem) {
+      .site-header { background: color-mix(in srgb, var(--color-page) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    }
   }
-  .main-nav li:first-child a { padding-left: 0; }
-  @media (min-width: 48rem) { .main-nav li:first-child a { padding-left: var(--space-3); } }
-  .main-nav a:hover { color: var(--color-text-strong); text-decoration: underline; }
-  .main-nav a[aria-current='page'] { color: var(--color-text-strong); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.4em; text-decoration-color: var(--color-accent); }
-  .tools { display: flex; align-items: center; gap: var(--space-1); }
+  .bar {
+    display: grid; align-items: center; gap: 0 var(--space-4); min-height: var(--header-height);
+    grid-template-columns: 1fr auto; grid-template-areas: "home tools" "nav nav";
+  }
+  @media (min-width: 64rem) {
+    .bar { grid-template-columns: 1fr auto 1fr; grid-template-areas: "nav home tools"; }
+  }
+  .home { grid-area: home; text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
+  .main-nav { grid-area: nav; border-top: 1px solid var(--color-border); margin-inline: calc(-1 * var(--space-gutter)); padding-inline: var(--space-gutter); }
+  @media (min-width: 64rem) { .main-nav { border-top: 0; margin-inline: 0; padding-inline: 0; } }
+  .main-nav ul { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); }
+  .main-nav a, .text-link {
+    display: inline-flex; align-items: center; min-height: var(--target-min);
+    font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: var(--tracking-label); text-transform: uppercase;
+    color: var(--color-text-strong); text-decoration: none;
+  }
+  .main-nav a:hover, .text-link:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+  :is(.main-nav a, .text-link)[aria-current='page'] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.45em; }
+  .tools { grid-area: tools; display: flex; align-items: center; justify-content: flex-end; gap: var(--space-1); }
+  .contact { margin-right: var(--space-3); }
+  @media (max-width: 30rem) { .contact { display: none; } }
   .icon-btn { background: none; color: var(--color-text-strong); border: 1px solid transparent; }
   .icon-btn:hover { background: var(--color-bg-subtle); }
   .theme-toggle .sun { display: none; }
   .theme-toggle[aria-pressed='true'] .sun { display: block; }
   .theme-toggle[aria-pressed='true'] .moon { display: none; }
-  .cta { margin-left: var(--space-2); }
-  @media (max-width: 26rem) { .cta { display: none; } }
 </style>

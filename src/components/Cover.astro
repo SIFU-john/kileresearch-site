@@ -1,0 +1,15 @@
+---
+// Article cover. Uses the author's `cover` image when set (with its alt text); otherwise the
+// generated artwork, which is decorative (alt="").
+import { Image } from 'astro:assets';
+import { COVER_H, COVER_W, coverUrl } from '../lib/cover';
+import type { Article } from '../lib/content';
+interface Props { article?: Article; slug?: string; eager?: boolean; class?: string; sizes?: string }
+const { article, slug = article?.id ?? 'about', eager = false, class: cls, sizes = '(min-width: 64rem) 50vw, 100vw' } = Astro.props;
+const custom = article?.data.cover;
+---
+{custom ? (
+  <Image class:list={['cover', cls]} src={custom} alt={article!.data.coverAlt ?? ''} widths={[480, 800, 1200]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+) : (
+  <img class:list={['cover', cls]} src={coverUrl(slug)} alt="" width={COVER_W} height={COVER_H} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding={eager ? 'sync' : 'async'} />
+)}
