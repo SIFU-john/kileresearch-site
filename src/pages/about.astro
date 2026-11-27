@@ -7,19 +7,21 @@ import { site } from '../config/site';
   <div class="container section">
     <div class="page-prose">
       <h1>About Kile Research</h1>
-      <p class="lead">We publish practical research on AI and LLM inference: how models actually run, what makes them fast or slow, and how to choose between options.</p>
+      <p class="lead">We publish plain-language guides to how AI models actually run: on your own computer, how fast, at what cost, and with what trade-offs.</p>
       <h2>What we write</h2>
-      <p>Our articles are for developers, IT teams and curious learners at beginner to intermediate level. Each one teaches a single idea and ends with something you ran and measured yourself.</p>
+      <p>Our articles are for developers, IT teams and curious learners at beginner to intermediate level. Each one teaches a single idea, shows every step, and ends with something you can run and measure yourself.</p>
       <h2>How we write</h2>
       <ul>
         <li><strong>Reproducible.</strong> Every article links to its code in our <a href={site.codeRepo}>public GitHub repository<span class="visually-hidden"> (opens external site)</span></a>.</li>
-        <li><strong>Honest about limits.</strong> We say what we tested on, and that your numbers will differ.</li>
-        <li><strong>Facts and opinions stay separate.</strong> We say what we measured, what the documentation says, and what we think it means.</li>
+        <li><strong>Honest about limits.</strong> We say what we tested on, and that your results may differ on other hardware.</li>
+        <li><strong>Facts and opinions kept apart.</strong> We say what we measured, what the documentation says, and what we think it means.</li>
       </ul>
+      <h2>Where we publish</h2>
+      <p>This site is the home of our research. Some articles also appear on Medium, and those copies link back here.</p>
       <h2>Working with businesses</h2>
       <p>We also help small businesses put AI to work in a way that is practical, private and secure. <a href="/consulting/">See how we can help</a>.</p>
       <h2>Spotted a mistake?</h2>
-      <p>Tell us. <a href={`${site.codeRepo}/issues`}>Open an issue on GitHub<span class="visually-hidden"> (opens external site)</span></a> or <a href="/contact/">get in touch</a>. We correct errors openly and note the update on the article.</p>
+      <p>Please tell us. <a href={`${site.codeRepo}/issues`}>Open an issue on GitHub<span class="visually-hidden"> (opens external site)</span></a> or <a href="/contact/">get in touch</a>. We correct errors openly and note each update on the article.</p>
       <AuthorBox id="kile-research" />
     </div>
   </div>

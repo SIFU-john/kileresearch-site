@@ -1,5 +1,6 @@
 ---
-// Consulting / Services (KILA-42 page-layouts §C, rev 5). All copy is placeholder for Chris.
+// Consulting / Services (KILA-42 page-layouts §C, rev 5). Copy: KILA-44 site-copy v1.
+// [Square brackets] are placeholders waiting on the CEO; keep them until confirmed.
 // Claims rule (Sentinel): no "bank-grade", "100% secure", "certified", "guaranteed", "audit";
 // standards are "informed by", never "compliant with". No prices until the Board approves.
 import Cover from '../components/Cover.astro';
@@ -13,38 +14,41 @@ import { getArticles } from '../lib/content';
 const articles = await getArticles();
 const fromResearch = [...articles].sort((a, b) => (a.data.level === 'beginner' ? -1 : 0) - (b.data.level === 'beginner' ? -1 : 0) || a.data.date.getTime() - b.data.date.getTime()).slice(0, 3);
 const steps = [
-  ['Free intro call', '30 minutes to understand your goals.'],
-  ['Assessment', 'We look at your processes, data and risks.'],
-  ['Plan or build', 'A clear recommendation, or a small working setup.'],
-  ['Handover', 'Documentation and training so your team owns it.'],
+  ['[Free] intro call', 'A [30-minute] call to understand your business and what you want from AI.'],
+  ['Assessment', 'We look at how you work, the data involved and the risks.'],
+  ['Plan or build', 'A clear recommendation, or a small working setup, depending on the service.'],
+  ['Handover', 'Documentation and training, so your team can run it without us.'],
 ];
 const weWill = [
   ...(contentFlags.dataStaysYours ? ["Your data stays yours. We use it only for your project, never sell or share it, and return or delete it when we're done."] : []),
   'We never use your data to train AI models.',
   'Explain everything in plain language.',
-  "Tell you if AI isn't the right answer.",
+  "Tell you honestly if AI isn't the right answer.",
+  'Put our findings and recommendations in writing.',
 ];
 const weWont = [
   'Lock you into our tools.',
-  ...(contentFlags.flexibleTerms ? ['Tie you into long contracts: fixed-scope projects or month-to-month.'] : []),
+  ...(contentFlags.flexibleTerms ? ['Tie you into a long contract. Fixed-scope projects or month-to-month. No long lock-ins.'] : []),
+  "Quote savings before we've measured your usage.",
+  'Test any system without your written permission.',
 ];
 const faqs = [
-  ['Do we need technical staff?', "[Placeholder] No. We explain everything in plain language and hand over documentation your team can follow."],
-  ['What does it cost?', '[Placeholder] Pricing is being finalised. Tell us about your business and we will give you a clear quote before any work starts.'],
-  ['Will our data leave our business?', '[Placeholder] Only if you choose a setup that needs it. Private and local options keep data on your own machines or private cloud.'],
-  ['Which service should we start with?', 'Not sure? Start with the adoption assessment, or just tell us your problem.'],
-  ['Do you work remotely?', '[Placeholder] Yes.'],
-  ['How long does it take?', '[Placeholder] It depends on the service. Typical lengths are to be confirmed.'],
+  ['Do we need technical staff?', "No. We explain everything in plain language and leave you with documentation your team can follow. If a setup needs ongoing technical care, we'll tell you before you decide and show you what's involved."],
+  ['What does it cost?', "It depends on the service and the size of your business. Prices are on request for now. Tell us what you need and we'll send you a clear quote before any work starts."],
+  ['Will our data leave our business?', "Only if you choose a setup that needs it, and we'll explain that before you decide. With a local or private setup, the AI runs on machines you control, so your data isn't sent to a public AI service. During a project we only ask for the data the work needs, and we never use your data to train AI models."],
+  ['Which service should we start with?', "If you're not sure, start with the AI adoption assessment. Or just tell us the problem in your own words and we'll suggest where to begin."],
+  ['Do you work remotely?', '[Yes. We work by video call and email.] [On-site visits: whether and where.]'],
+  ['How long does it take?', 'It depends on the service and on what you already have in place. Your quote will include an expected timeline. [Typical length per service]'],
 ];
 const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8.5 3 3 7-7"/></svg>';
 ---
-<BaseLayout title="Consulting for small businesses" description="Practical AI for small businesses: adoption assessments, private LLM deployment, inference cost optimisation and AI security reviews." enquiry>
+<BaseLayout title="Consulting for small businesses" description="Practical AI help for small businesses: finding where AI fits, running it privately, bringing costs down and reviewing AI security." enquiry>
   <section class="hero" data-surface="ink" aria-labelledby="c-hero">
     <div class="container hero-grid">
     <div class="stack hero-inner">
       <p class="overline">Consulting for small businesses</p>
       <h1 id="c-hero">Practical AI for your business, without the guesswork.</h1>
-      <p class="lead">We help small teams work out where AI helps, run it privately and affordably, and keep it secure.</p>
+      <p class="lead">We help small teams find where AI really helps, run it privately and affordably, and check that it's set up safely.</p>
       <p class="actions"><a class="btn btn-primary" href="#enquiry">Tell us about your business</a> <a href="#services">See our services ↓</a></p>
     </div>
     <div class="hero-art media"><Cover slug="consulting" /></div>
@@ -76,8 +80,8 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
             <ul class="list-reset bullets">{s.bullets.map((b) => <li><Fragment set:html={check} /><span>{b.lead && <strong>{b.lead} </strong>}{b.text}</span></li>)}</ul>
           </div>
           <p class="muted small">Typical length: [TBC]</p>
-          <p class="muted small">Price: [Price on request — pending Board approval]</p>
-          {s.id === 'cost' && <p class="muted small">We never quote example savings. Numbers only ever come from measuring your own usage.</p>}
+          <p class="muted small">Price: On request</p>
+          {s.id === 'cost' && <p class="muted small">We never quote example savings. Any numbers come from measuring your own usage.</p>}
           {s.id === 'security' && (
             <>
               <p class="muted small">Informed by the OWASP Top 10 for LLM Applications and the NIST AI Risk Management Framework.</p>
@@ -102,7 +106,6 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
     <div class="container section-tight">
       <h2 id="process-title">How it works</h2>
       <ol class="list-reset steps">{steps.map(([t, b], i) => <li><span class="n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p class="muted">{b}</p></div></li>)}</ol>
-      <p class="muted small">Durations are placeholders until confirmed.</p>
     </div>
   </section>
 
@@ -120,7 +123,7 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
   </section>
 
   <section class="container section-tight" aria-labelledby="faq-title">
-    <h2 id="faq-title">Questions</h2>
+    <h2 id="faq-title">Common questions</h2>
     <div class="faq">{faqs.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div>
   </section>
 
@@ -133,9 +136,9 @@ const check = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fil
       <aside class="next" aria-labelledby="next-title">
         <h3 id="next-title">What happens next</h3>
         <ol>
-          <li>We reply within {site.replyDays} working days.</li>
-          <li>We book a 30-minute call.</li>
-          <li>No obligation.</li>
+          <li>We read your message and reply within {site.replyDays} working days.</li>
+          <li>If it looks like we can help, we'll suggest a time for a [30-minute] call.</li>
+          <li>There's no obligation. If we're not the right fit, we'll say so.</li>
         </ol>
         <p class="muted small">Prefer email? <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
       </aside>

@@ -9,9 +9,9 @@ const articles = await getArticles();
 <BaseLayout title="Research" description="Every Kile Research article, newest first: plain-language, reproducible write-ups on AI and LLM inference, with code you can run.">
   <div class="container page">
     <header class="head">
-      <p class="overline">{articles.length} articles · <a href="/rss.xml">RSS</a></p>
+      <p class="overline">{articles.length} {articles.length === 1 ? 'article' : 'articles'} · <a href="/rss.xml">RSS</a></p>
       <h1>Research</h1>
-      <p class="lead">Plain-language, reproducible write-ups on running and measuring AI models. Newest first.</p>
+      <p class="lead">Plain-language guides to running and measuring AI models, newest first. Every article links to its code.</p>
     </header>
     <Search />
     <FilterNav articles={articles} />

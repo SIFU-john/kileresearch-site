@@ -47,7 +47,7 @@ function toMedium(body, canonical) {
   // Absolute URLs for links and images, so nothing breaks off-site.
   html = html.replace(/\s(href|src)="(\/[^"]*)"/g, (_, attr, p) => ` ${attr}="${new URL(p, site).href}"`);
   html = html.replace(/\shref="#([^"]*)"/g, (_, h) => ` href="${canonical}#${h}"`);
-  const footer = `<hr><p><em>Originally published at <a href="${canonical}">${domain}</a>, with code to reproduce it.</em></p>`;
+  const footer = `<hr><p><em>Originally published at <a href="${canonical}">${domain}</a>, where you'll also find the code to reproduce it.</em></p>`;
   return html.trim() + '\n' + footer;
 }
 

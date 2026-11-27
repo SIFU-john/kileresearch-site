@@ -13,6 +13,7 @@
   </form>
   <p class="status" id="search-status" role="status" aria-live="polite" tabindex="-1"></p>
   <div class="empty" hidden data-search-empty>
+    <p class="hint">Try a shorter word or a different spelling, or browse all our research.</p>
     <button class="btn btn-secondary" type="button" data-search-clear>Clear search</button>
     <a href="/research/">All research</a>
   </div>
@@ -106,6 +107,7 @@
   .status:empty { display: none; }
   .empty { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
   .empty[hidden] { display: none; }
+  .empty .hint { flex-basis: 100%; color: var(--color-text-muted); }
   .results { display: grid; gap: var(--space-5); }
   .results :global(a) { font-weight: var(--weight-semibold); font-size: var(--text-lg); }
   .results :global(p) { font-family: var(--font-reading); color: var(--color-read-muted); margin-top: var(--space-1); }

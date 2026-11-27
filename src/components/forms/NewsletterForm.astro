@@ -11,21 +11,21 @@ const H = headingLevel;
 const nl = integrations.newsletter;
 ---
 <section class:list={['newsletter', { 'panel panel-subtle': variant === 'panel', bare: variant === 'bare' }]} aria-labelledby={`${idPrefix}-title`}>
-  <H id={`${idPrefix}-title`} class="nl-title">Subscribe to the newsletter</H>
+  <H id={`${idPrefix}-title`} class="nl-title">Get new research by email</H>
   <p class="nl-copy">New research, about once a {site.newsletterCadence}. Unsubscribe any time.</p>
   {nl.configured ? (
     <form class="nl-form" method="post" action={nl.action}>
       <input type="hidden" name="embed" value="1" />
       <label class="visually-hidden" for={`${idPrefix}-email`}>Email address</label>
-      <input class="input" id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Email address" />
+      <input class="input" id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" required maxlength="254" placeholder="name@example.com" />
       <button class="btn btn-primary btn-block" type="submit">Subscribe</button>
-      <p class="fine">We only use your email to send the newsletter. <a href="/privacy/">Privacy notice</a></p>
+      <p class="fine">We only use your email to send you new research. <a href="/privacy/">Privacy notice</a></p>
     </form>
   ) : (
     <div class="nl-off">
       <p>Email sign-up isn't switched on yet.</p>
       <a class="btn btn-primary btn-block" href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Newsletter sign-up')}`}>Email us to join</a>
-      <p class="fine">We'll add you when it launches. <a href="/privacy/">Privacy notice</a></p>
+      <p class="fine">We'll add you to the list when it launches. <a href="/privacy/">Privacy notice</a></p>
     </div>
   )}
 </section>

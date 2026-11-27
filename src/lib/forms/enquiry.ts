@@ -15,7 +15,9 @@ function message(field: Field) {
   const label = field.labels?.[0]?.childNodes[0]?.textContent?.trim() ?? field.name;
   if (field.validity.valueMissing) return `Enter your ${label.toLowerCase()}`;
   if (field.validity.typeMismatch) return 'Enter an email address in the right format, like name@example.com';
-  if (field.validity.tooLong) return `${label} must be ${field.getAttribute('maxlength')} characters or fewer`;
+  if (field.validity.tooLong) return field.name === 'message'
+    ? 'Your message is over 2,000 characters. Please shorten it and try again.'
+    : `${label} must be ${field.getAttribute('maxlength')} characters or fewer`;
   return field.validationMessage;
 }
 

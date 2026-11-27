@@ -6,12 +6,12 @@ export interface Author {
 }
 
 // House style: every article is credited to Kile Research, with no individual names.
-// STUB: bio and links to be confirmed by the author (KILA-42 doc 2 §11: no invented credentials).
+// Copy: KILA-44 site-copy v1 (no individuals, no credentials).
 export const authors = {
   'kile-research': {
     name: 'Kile Research',
-    role: 'Reproducible research on AI inference',
-    bio: 'We write hands-on, reproducible guides to how AI models actually run. Every article links to the code we used, so you can check our work and run it yourself.',
+    role: 'Research publication',
+    bio: 'Kile Research writes reproducible, plain-language guides to AI and LLM inference. Every article is credited to Kile Research.',
     links: [
       { label: 'GitHub', href: 'https://github.com/SIFU-john/KileResearch' },
       { label: 'About us', href: '/about/' },

@@ -30,7 +30,8 @@ const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquir
       </div>
       <div class="field">
         <label for={id('email')}>Work email</label>
-        <input class="input" id={id('email')} name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby={id('email-error')} />
+        <p class="hint" id={id('email-hint')}>We'll reply to this address.</p>
+        <input class="input" id={id('email')} name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby={`${id('email-hint')} ${id('email-error')}`} />
         <p class="field-error" id={id('email-error')} hidden></p>
       </div>
       <div class="field">
@@ -46,7 +47,7 @@ const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquir
       </div>
       <div class="field">
         <label for={id('message')}>Tell us a bit more <span class="optional">(optional)</span></label>
-        <p class="hint" id={id('message-hint')}>Please don't include sensitive personal information (such as health or financial account details) or personal data about customers or staff. Up to 2,000 characters.</p>
+        <p class="hint" id={id('message-hint')}>For example, what you'd like AI to help with, or what's worrying you. Please don't include sensitive personal information (such as health or financial details) or personal data about customers or staff. Up to 2,000 characters.</p>
         <textarea class="input" id={id('message')} name="message" maxlength="2000" aria-describedby={`${id('message-hint')} ${id('message-error')}`}></textarea>
         <p class="field-error" id={id('message-error')} hidden></p>
       </div>
@@ -65,12 +66,13 @@ const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquir
     )}
     <div class="alert alert-success" data-status="success" tabindex="-1" role="status" hidden>
       <p><strong>Thanks, your enquiry has been sent.</strong> We'll reply within {site.replyDays} working days.</p>
+      <p><a href="/research/">Read our research</a> · <a href="/">Home</a></p>
     </div>
     <div class="alert alert-info" data-status="unavailable" tabindex="-1" role="status" hidden>
-      <p>Our enquiry form isn't switched on yet. <a data-mailto-link href={mailto}>Send your enquiry by email instead</a>; we've filled it in for you.</p>
+      <p>Our enquiry form isn't switched on yet, so nothing was sent. <a data-mailto-link href={mailto}>Send your enquiry by email instead</a>. We've filled it in for you.</p>
     </div>
     <div class="alert alert-danger" data-status="error" tabindex="-1" role="status" hidden>
-      <p>Your enquiry didn't send. Please try again, or <a data-mailto-link href={mailto}>email us directly</a>.</p>
+      <p>Sorry, your enquiry didn't send. Check your internet connection and try again. If it still doesn't work, <a data-mailto-link href={mailto}>email us directly</a>.</p>
     </div>
   </div>
 )}

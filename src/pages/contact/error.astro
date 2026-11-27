@@ -6,7 +6,7 @@ const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Enquir
 <BaseLayout title="Error: your enquiry didn't send" description="Something went wrong sending your enquiry." noindex>
   <div class="container section page-prose">
     <h1>Your enquiry didn't send</h1>
-    <p>Please check that you filled in your name and a valid email address, and that the message is under 2,000 characters, then <a href="/contact/">try again</a>.</p>
+    <p>Please check that you've entered your name and a valid email address, and that your message is under 2,000 characters. Then <a href="/contact/">try again</a>.</p>
     <p>If it still doesn't work, email us at <a href={mailto}>{site.contactEmail}</a>.</p>
   </div>
 </BaseLayout>
