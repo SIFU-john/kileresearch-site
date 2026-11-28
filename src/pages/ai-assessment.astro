@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
+
+const goals = [
+  ['task', 'Complete a recurring task'],
+  ['knowledge', 'Answer questions from our documents or data'],
+  ['model', 'Improve the consistency of AI outputs'],
+] as const;
+const followUps = [
+  { id: 'task', title: 'How does the task work?', questions: [
+    ['process', 'How predictable are the steps?', ['Usually the same', 'Vary from case to case', 'Still being defined']],
+    ['tools', 'What would AI need to do in your tools?', ['Prepare a draft or recommendation', 'Read or update one system', 'Choose between tools or take several actions']],
+    ['approval', 'Does a person need to approve actions?', ['Yes', 'No', 'Unsure']],
+  ] },
+  { id: 'knowledge', title: 'Where are your answers today?', questions: [
+    ['sources', 'Where is the trusted information?', ['An organised collection or system', 'Several places with different owners', 'We have yet to identify reliable sources']],
+    ['changes', 'How often does the information change?', ['Frequently', 'Occasionally', 'Rarely']],
+    ['access', 'What must the answers support?', ['Citations', 'Different access permissions', 'Both citations and access permissions', 'Neither or unsure']],
+  ] },
+  { id: 'model', title: 'What does the model need to do better?', questions: [
+    ['gap', 'What is the main gap?', ['Inconsistent format, tone or classification', 'Missing current or business-specific facts', 'We have yet to identify the issue']],
+    ['prompt', 'Have improved prompts and examples been tested?', ['Yes, but results are still inconsistent', 'No or unsure']],
+    ['examples', 'Do you have approved examples and a way to score outputs?', ['Yes, both', 'Examples only', 'Neither or unsure']],
+  ] },
+] as const;
+---
+<BaseLayout title="AI Needs Assessment" description="Find a starting point for AI in your business." noindex>
+  <section class="container section assessment" aria-labelledby="assessment-title">
+    <h1 id="assessment-title">AI Needs Assessment</h1>
+    <p class="lead">Tell us what you want AI to help with. Your answers shape the questions and the recommendation you see.</p>
+    <p class="alert alert-info">Draft preview. Use a sample email and leave out personal or confidential details. Answers stay on this page and are discarded when you leave.</p>
+
+    <noscript><p>Enable JavaScript to try the adaptive assessment.</p></noscript>
+    <form class="form" data-assessment hidden>
+      <section data-step="start">
+        <h2 tabindex="-1">Your business</h2>
+        <label for="business">What does your business do, and which team would use AI?</label>
+        <input class="input" id="business" name="business" required maxlength="150" />
+        <label for="example">Describe one example of the work and the result you want.</label>
+        <textarea class="input" id="example" name="example" required maxlength="600" rows="4"></textarea>
+        <fieldset>
+          <legend>What would you like AI to help with? Choose up to two.</legend>
+          {goals.map(([value, label]) => <label class="choice"><input type="checkbox" name="goal" value={value} /> {label}</label>)}
+          <label class="choice"><input type="checkbox" name="goal" value="unsure" /> I’m not sure yet</label>
+        </fieldset>
+        <label for="outcome">What would make this worthwhile?</label>
+        <select class="input" id="outcome" name="outcome" required>
+          <option value="">Choose an outcome</option>
+          <option value="time saved">Save staff time</option>
+          <option value="error rate">Reduce errors</option>
+          <option value="response time">Respond faster</option>
+          <option value="output consistency">Improve consistency</option>
+          <option value="work completed per week">Handle more work</option>
+        </select>
+      </section>
+
+      {followUps.map(({ id, title, questions }) => <section data-step={id} hidden>
+        <h2 tabindex="-1">{title}</h2>
+        {questions.map(([name, label, options]) => <div class="question">
+          <label for={name}>{label}</label>
+          <select class="input" id={name} name={name} required>
+            <option value="">Choose an answer</option>
+            {options?.map((option, index) => <option value={String(index)}>{option}</option>)}
+          </select>
+        </div>)}
+      </section>)}
+
+      <section data-step="contact" hidden>
+        <h2 tabindex="-1">Requirements and contact</h2>
+        <fieldset>
+          <legend>What requirements should we account for?</legend>
+          {['Sensitive data', 'Private or on-premises hosting', 'Human approval', 'Existing system integrations'].map(requirement =>
+            <label class="choice"><input type="checkbox" name="requirement" value={requirement} /> {requirement}</label>)}
+        </fieldset>
+        <label for="work-email">Work email</label>
+        <input class="input" id="work-email" name="email" type="email" autocomplete="off" placeholder="name@example.com" required maxlength="254" />
+        <label class="choice"><input name="discovery" type="checkbox" /> I’d like to book a 30-minute discovery call.</label>
+      </section>
+      <p class="alert alert-danger" data-error role="alert" hidden></p>
+      <div class="controls">
+        <button class="btn btn-secondary" type="button" data-back hidden>Back</button>
+        <button class="btn btn-primary" type="submit" data-next>Continue</button>
+      </div>
+    </form>
+
+    <section data-result hidden aria-labelledby="result-title" class="result">
+      <h2 id="result-title" tabindex="-1">Your recommended starting point</h2>
+      <div data-recommendations></div>
+      <p data-metric></p>
+      <p data-requirements></p>
+      <p data-booking hidden><a class="btn btn-primary" href={site.introCallUrl}>Book your 30-minute discovery call</a></p>
+      <button class="btn btn-secondary" type="button" data-restart>Start again</button>
+    </section>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../lib/assessment';
+</script>
+
+<style>
+  .assessment { max-width: 48rem; }
+  .assessment :is(.lead, .alert, .form, .result) { margin-top: var(--space-5); }
+  form [data-step]:not([hidden]), .question { display: grid; gap: var(--space-3); }
+  fieldset { border: 0; padding: 0; margin: var(--space-2) 0; min-width: 0; }
+  legend, form label:not(.choice) { font-weight: 600; }
+  .choice { display: flex; align-items: baseline; gap: var(--space-2); padding-block: var(--space-2); }
+  .controls { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+  [data-recommendations], .result p { margin-block: var(--space-4); }
+  [data-recommendations] :global(article + article) { margin-top: var(--space-4); }
+</style>
