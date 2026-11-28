@@ -15,7 +15,7 @@ function rewriteHref(href) {
   if (typeof href !== 'string' || /^([a-z]+:|\/|#)/i.test(href)) return href;
   const [pathPart, hash = ''] = href.split('#');
   const article = /^(?:\.\/|\.\.\/articles\/)?([^/]+)\.mdx?$/.exec(pathPart);
-  if (article) return `/research/${article[1]}/${hash ? `#${hash}` : ''}`;
+  if (article) return `/tutorials/${article[1]}/${hash ? `#${hash}` : ''}`;
   return CODE_REPO + pathPart.replace(/^(\.\.\/)+/, '') + (hash ? `#${hash}` : '');
 }
 

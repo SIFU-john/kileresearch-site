@@ -49,7 +49,7 @@ const jsonLd = [
 
   {tiles.length > 0 && (
     <section class="container" aria-labelledby="more-title">
-      <h2 id="more-title" class="visually-hidden">More research</h2>
+      <h2 id="more-title" class="visually-hidden">More tutorials</h2>
       <ul class="list-reset tiles">{tiles.map((a) => <li><ArticleCard article={a} /></li>)}</ul>
     </section>
   )}
@@ -58,10 +58,10 @@ const jsonLd = [
     <section class="reading" aria-labelledby="start-title">
       <div class="section-label">
         <h2 id="start-title" class="overline">Start here{seriesName && `: ${seriesName}`}</h2>
-        <a class="text-more" href={seriesName ? seriesUrl(seriesName) : '/research/'}>View series<span class="visually-hidden">: {seriesName}</span></a>
+        <a class="text-more" href={seriesName ? seriesUrl(seriesName) : '/tutorials/'}>View series<span class="visually-hidden">: {seriesName}</span></a>
       </div>
       <ol class="list-reset posts">{seriesParts.map((a) => <li><ArticleRow article={a} showTags={false} /></li>)}</ol>
-      <a class="btn btn-secondary btn-block" href="/research/">All research</a>
+      <a class="btn btn-secondary btn-block" href="/tutorials/">All tutorials</a>
     </section>
 
     <aside class="sidebar" aria-label="About Kile Research">

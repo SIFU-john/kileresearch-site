@@ -4,8 +4,8 @@
 // still works. KILA-42 page-layouts §B2.
 ---
 <search class="search" id="search-region" hidden data-search>
-  <form class="search-form" role="search" action="/research/" method="get">
-    <label for="search">Search research</label>
+  <form class="search-form" role="search" action="/tutorials/" method="get">
+    <label for="search">Search tutorials</label>
     <div class="row">
       <input class="input" id="search" name="q" type="search" autocomplete="off" spellcheck="false" />
       <button class="btn btn-secondary" type="submit">Search</button>
@@ -15,7 +15,7 @@
   <div class="empty" hidden data-search-empty>
     <p class="hint">Try a shorter word or a different spelling, or browse all our research.</p>
     <button class="btn btn-secondary" type="button" data-search-clear>Clear search</button>
-    <a href="/research/">All research</a>
+    <a href="/tutorials/">All tutorials</a>
   </div>
   <ol class="results list-reset" id="search-results"></ol>
 </search>

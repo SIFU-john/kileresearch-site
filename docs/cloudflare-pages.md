@@ -56,6 +56,6 @@ If any Function variable or the binding is missing, the Function reads nothing a
 
 - [ ] Preview deployed with `CSP_MODE=report-only`; zero CSP violations in the console across Home, an article, Research search, Consulting (Turnstile), Contact (submit), newsletter POST.
 - [ ] Switch to `CSP_MODE=enforce`; repeat.
-- [ ] `curl -sI` on `/`, an article, `/research/`, `/contact/`, `/privacy/`, a 404 and `POST /api/contact` shows the expected headers (KILA-43 Gate B, B3).
+- [ ] `curl -sI` on `/`, an article, `/tutorials/`, `/contact/`, `/privacy/`, a 404 and `POST /api/contact` shows the expected headers (KILA-43 Gate B, B3).
 - [ ] No `Set-Cookie` anywhere; with GPC on, no request to `cloudflareinsights.com`.
 - [ ] Gate A (KILA-42) and Gate B (KILA-43) signed off; user approval to go live recorded on the task.

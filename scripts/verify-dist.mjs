@@ -69,15 +69,15 @@ for (const f of (await readdir('src/content/research')).filter((f) => /\.mdx?$/.
 const feeds = [await readFile(path.join(dist, 'rss.xml'), 'utf8').catch(() => ''), await readFile(path.join(dist, 'sitemap-0.xml'), 'utf8').catch(() => '')];
 const pfIndex = (await readdir(path.join(dist, 'pagefind', 'fragment')).catch(() => [])).length;
 for (const slug of drafts) {
-  if (await stat(path.join(dist, 'research', slug)).then(() => true, () => false)) errors.push(`draft ${slug} was built`);
-  if (feeds.some((x) => x.includes(`/research/${slug}/`))) errors.push(`draft ${slug} is in RSS or sitemap`);
+  if (await stat(path.join(dist, 'tutorials', slug)).then(() => true, () => false)) errors.push(`draft ${slug} was built`);
+  if (feeds.some((x) => x.includes(`/tutorials/${slug}/`))) errors.push(`draft ${slug} is in RSS or sitemap`);
 }
 if (pfIndex === 0) errors.push('pagefind: no fragments indexed');
 
 for (const slug of (await readdir('src/content/research')).filter((f) => /^[^_].*\.mdx?$/.test(f)).map((f) => f.replace(/\.mdx?$/, ''))) {
   const src = await readFile(`src/content/research/${slug}.md`, 'utf8').catch(() => '');
   if (/^draft: true/m.test(src)) continue;
-  const html = await readFile(path.join(dist, 'research', slug, 'index.html'), 'utf8').catch(() => null);
+  const html = await readFile(path.join(dist, 'tutorials', slug, 'index.html'), 'utf8').catch(() => null);
   if (!html) { errors.push(`article ${slug} not built`); continue; }
   const fences = (src.match(/^\s*```/gm) ?? []).length / 2;
   const body = html.split('data-pagefind-body')[1]?.split('class="article-end')[0] ?? '';

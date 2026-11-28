@@ -17,7 +17,7 @@ const { all, name, items } = Astro.props;
 ---
 <BaseLayout title={name} description={`Every part of the ${name} series from Kile Research, in reading order, with runnable code for each step.`}>
   <div class="container section">
-    <nav class="crumb" aria-label="Breadcrumb"><a href="/research/">Research</a> / Series</nav>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="/tutorials/">Tutorials</a> / Series</nav>
     <h1>{name}</h1>
     <p class="lead">{items.length} parts, in reading order.</p>
     <FilterNav articles={all} current={seriesUrl(name)} />

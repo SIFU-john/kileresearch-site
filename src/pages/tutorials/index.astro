@@ -6,11 +6,11 @@ import FilterNav from '../../components/FilterNav.astro';
 import { getArticles } from '../../lib/content';
 const articles = await getArticles();
 ---
-<BaseLayout title="Research" description="Every Kile Research article, newest first: plain-language, reproducible write-ups on AI and LLM inference, with code you can run.">
+<BaseLayout title="Tutorials" description="Every Kile Research article, newest first: plain-language, reproducible write-ups on AI and LLM inference, with code you can run.">
   <div class="container page">
     <header class="head">
       <p class="overline">{articles.length} {articles.length === 1 ? 'article' : 'articles'} · <a href="/rss.xml">RSS</a></p>
-      <h1>Research</h1>
+      <h1>Tutorials</h1>
       <p class="lead">Plain-language guides to running and measuring AI models, newest first. Every article links to its code.</p>
     </header>
     <Search />

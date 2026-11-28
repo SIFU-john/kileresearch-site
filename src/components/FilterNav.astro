@@ -11,7 +11,7 @@ const isAll = current === undefined;
 <div class="filters">
   <nav aria-label="Filter by topic">
     <ul class="list-reset chips">
-      <li><a class="chip" href="/research/" aria-current={isAll ? 'page' : undefined}><Fragment set:html={check} />All</a></li>
+      <li><a class="chip" href="/tutorials/" aria-current={isAll ? 'page' : undefined}><Fragment set:html={check} />All</a></li>
       {tags.map((t) => <li><a class="chip" href={tagUrl(t)} aria-current={current === tagUrl(t) ? 'page' : undefined}><Fragment set:html={check} />{tagLabel(t)}</a></li>)}
     </ul>
   </nav>

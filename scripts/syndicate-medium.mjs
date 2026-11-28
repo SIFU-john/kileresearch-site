@@ -51,8 +51,8 @@ function toMedium(body, canonical) {
   return html.trim() + '\n' + footer;
 }
 
-const slugs = (await readdir('dist/research', { withFileTypes: true }).catch(() => {
-  console.error('dist/research not found. Run `npm run build` first.');
+const slugs = (await readdir('dist/tutorials', { withFileTypes: true }).catch(() => {
+  console.error('dist/tutorials not found. Run `npm run build` first.');
   process.exit(1);
 }))
   .filter((e) => e.isDirectory() && !['tags', 'series'].includes(e.name))
@@ -61,10 +61,10 @@ const slugs = (await readdir('dist/research', { withFileTypes: true }).catch(() 
 
 await mkdir(outDir, { recursive: true });
 for (const slug of slugs) {
-  const page = await readFile(path.join('dist/research', slug, 'index.html'), 'utf8');
+  const page = await readFile(path.join('dist/tutorials', slug, 'index.html'), 'utf8');
   const title = decode(/<h1[^>]*>([\s\S]*?)<\/h1>/.exec(page)?.[1] ?? slug);
   const lede = /<p class="lede"[^>]*>([\s\S]*?)<\/p>/.exec(page)?.[1] ?? '';
-  const canonical = /<link rel="canonical" href="([^"]+)"/.exec(page)?.[1] ?? new URL(`/research/${slug}/`, site).href;
+  const canonical = /<link rel="canonical" href="([^"]+)"/.exec(page)?.[1] ?? new URL(`/tutorials/${slug}/`, site).href;
   const body = page.split('data-pagefind-body')[1]?.replace(/^[^>]*>/, '').split('<footer class="article-end')[0]?.replace(/<\/div>\s*$/, '') ?? '';
   const doc = `<!doctype html>
 <html lang="en-GB"><head><meta charset="utf-8"><title>${encode(title)} (Medium export)</title>

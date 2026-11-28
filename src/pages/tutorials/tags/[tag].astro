@@ -12,9 +12,9 @@ export async function getStaticPaths() {
 interface Props { all: Article[]; tag: string; items: Article[] }
 const { all, tag, items } = Astro.props;
 ---
-<BaseLayout title={`Research on ${tagLabel(tag)}`} description={`Kile Research articles about ${tagLabel(tag)}: plain-language, reproducible write-ups on AI and LLM inference.`}>
+<BaseLayout title={`Tutorials on ${tagLabel(tag)}`} description={`Kile Research articles about ${tagLabel(tag)}: plain-language, reproducible write-ups on AI and LLM inference.`}>
   <div class="container section">
-    <nav class="crumb" aria-label="Breadcrumb"><a href="/research/">Research</a> / Topic</nav>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="/tutorials/">Tutorials</a> / Topic</nav>
     <h1>{tagLabel(tag)}</h1>
     <p class="lead">{items.length} article{items.length === 1 ? '' : 's'}</p>
     <FilterNav articles={all} current={tagUrl(tag)} />

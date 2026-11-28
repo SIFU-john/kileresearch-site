@@ -6,7 +6,7 @@ module.exports = {
     collect: {
       startServerCommand: 'node scripts/serve.mjs',
       startServerReadyPattern: 'serving dist',
-      url: ['/', '/research/', '/research/03-measure-inference-speed/', '/research/04-quantization-explained/', '/consulting/', '/contact/', '/about/'].map((p) => base + p),
+      url: ['/', '/tutorials/', '/tutorials/03-measure-inference-speed/', '/tutorials/04-quantization-explained/', '/consulting/', '/contact/', '/about/'].map((p) => base + p),
       numberOfRuns: 3,
       settings: { preset: 'desktop' },
     },

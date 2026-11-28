@@ -74,7 +74,7 @@ const jsonLd = {
       <header class="article-head read-grid">
         <nav class="breadcrumb" aria-label="Breadcrumb">
           <ol>
-            <li><a href="/research/">Research</a></li>
+            <li><a href="/tutorials/">Tutorials</a></li>
             {d.series && <li><a href={seriesUrl(d.series.name)}>{d.series.name}</a></li>}
           </ol>
           {hasToc && <a class="jump-toc" href="#contents">Jump to contents</a>}
@@ -125,7 +125,7 @@ const jsonLd = {
 
   {related.length > 0 && (
     <section class="container related" aria-labelledby="related-title">
-      <h2 id="related-title">Related research</h2>
+      <h2 id="related-title">Related tutorials</h2>
       <ul class="list-reset related-grid">{related.map((a) => <li><ArticleCard article={a} /></li>)}</ul>
     </section>
   )}

@@ -10,15 +10,15 @@ export async function getArticles(): Promise<Article[]> {
   return all.sort((a, b) => b.data.date.getTime() - a.data.date.getTime() || (b.data.series?.part ?? 0) - (a.data.series?.part ?? 0));
 }
 
-export const articleUrl = (a: Article) => `/research/${a.id}/`;
-export const tagUrl = (tag: string) => `/research/tags/${tag}/`;
+export const articleUrl = (a: Article) => `/tutorials/${a.id}/`;
+export const tagUrl = (tag: string) => `/tutorials/tags/${tag}/`;
 export const slugify = (s: string) =>
   s
     .toLowerCase()
     .replace(/['’]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
-export const seriesUrl = (name: string) => `/research/series/${slugify(name)}/`;
+export const seriesUrl = (name: string) => `/tutorials/series/${slugify(name)}/`;
 export const tagLabel = (tag: string) => tag.replace(/-/g, ' ');
 
 /** KILA-42 doc 2 §9: 200 words per minute plus 10 s per code block, rounded up. Frontmatter wins. */

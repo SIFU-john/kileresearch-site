@@ -11,7 +11,7 @@ This draft is never published. It exists so designers and reviewers can check ev
 
 ## Text
 
-A paragraph with **bold**, *italic*, `inline code` and a [link](/research/). Define a term in **bold** the first time it appears.
+A paragraph with **bold**, *italic*, `inline code` and a [link](/tutorials/). Define a term in **bold** the first time it appears.
 
 > **Heads-up:** callouts are Markdown blockquotes that start with a bold label.
 

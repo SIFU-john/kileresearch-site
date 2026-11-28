@@ -28,7 +28,7 @@ export const site = {
   /** Optional: Medium profile, shown as "Also on Medium" in the footer. */
   mediumProfile: (env.PUBLIC_MEDIUM_PROFILE as string | undefined) || undefined,
   nav: [
-    { href: '/research/', label: 'Research' },
+    { href: '/tutorials/', label: 'Tutorials' },
     { href: '/consulting/', label: 'Consulting' },
     { href: '/about/', label: 'About' },
   ],

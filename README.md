@@ -15,7 +15,7 @@ The home of Kile Research (`kileresearch.ai`): practical, reproducible research 
 You only need a GitHub account with access to this repository. Everything happens in the browser.
 
 1. **Start a new file.** Open [`src/content/research/`](src/content/research/) on GitHub, then click **Add file → Create new file**.
-2. **Name the file** `NN-short-name.md`, for example `05-memory-bandwidth.md`: lowercase letters and hyphens. The file name becomes the web address: `kileresearch.ai/research/05-memory-bandwidth/`.
+2. **Name the file** `NN-short-name.md`, for example `05-memory-bandwidth.md`: lowercase letters and hyphens. The file name becomes the web address: `kileresearch.ai/tutorials/05-memory-bandwidth/`.
 3. **Paste this header at the very top** and fill it in:
 
    ```markdown
@@ -45,7 +45,7 @@ You only need a GitHub account with access to this repository. Everything happen
    - `draft: true` keeps the article off the live site, RSS, sitemap and search while you work on it.
 
 4. **Write the article below the second `---`** in normal Markdown, following [STYLE.md](https://github.com/SIFU-john/KileResearch/blob/main/STYLE.md). Don't repeat the title or byline; start with your opening paragraph.
-   - Links to other articles: `[Part 1](01-run-your-first-llm-locally.md)` or `[Part 1](/research/01-run-your-first-llm-locally/)`.
+   - Links to other articles: `[Part 1](01-run-your-first-llm-locally.md)` or `[Part 1](/tutorials/01-run-your-first-llm-locally/)`.
    - **Callouts:** start a quote with a bold label: `> **Tip:** ...`, `> **Note:** ...`, `> **Heads-up:** ...` (warning) or `> **Caution:** ...`. GitHub style `> [!TIP]` works too.
    - **Images:** upload to `src/content/research/images/` and write `![Describe the image](./images/my-chart.png "Figure 1. Optional caption")`. Alt text is required. Tables work as normal Markdown tables.
 5. **Open a pull request.** Choose **Create a new branch … and start a pull request**, then **Propose new file** and **Create pull request**.
@@ -58,7 +58,7 @@ You only need a GitHub account with access to this repository. Everything happen
 
 Our site is always the original; Medium copies point their canonical link back here.
 
-- **Once the site is live (preferred):** on Medium, go to *Import a story* (`medium.com/p/import`) and paste the article URL, e.g. `https://kileresearch.ai/research/03-measure-inference-speed/`. Medium imports it and sets the canonical link for you.
+- **Once the site is live (preferred):** on Medium, go to *Import a story* (`medium.com/p/import`) and paste the article URL, e.g. `https://kileresearch.ai/tutorials/03-measure-inference-speed/`. Medium imports it and sets the canonical link for you.
 - **Before that, or if the import mangles code:** run `npm run build && npm run syndicate:medium` (or `... -- 03-measure-inference-speed` for one article). Open `syndication/medium/<slug>.html` in a browser, copy the article into a new Medium story, then set **Story settings → Advanced settings → "This story was originally published elsewhere"** to the canonical URL shown at the top of the file. The export makes links absolute, turns tables into monospaced text (Medium has no tables) and adds "Originally published at kileresearch.ai, with code to reproduce it."
 - Then add `mediumUrl:` to the article's header so our page shows "Also on Medium".
 

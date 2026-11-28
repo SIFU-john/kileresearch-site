@@ -2,3 +2,8 @@
 # (docs/cloudflare-pages.md). Trailing slashes are handled by Pages automatically.
 /feed /rss.xml 301
 /feed/ /rss.xml 301
+
+# Preserve the former Research URLs, including article, tag and series links.
+/research /tutorials/ 301
+/research/ /tutorials/ 301
+/research/* /tutorials/:splat 301
