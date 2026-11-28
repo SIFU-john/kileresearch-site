@@ -3,7 +3,8 @@
 /feed /rss.xml 301
 /feed/ /rss.xml 301
 
-# Preserve the former Research URLs, including article, tag and series links.
-/research /tutorials/ 301
-/research/ /tutorials/ 301
-/research/* /tutorials/:splat 301
+# Preserve the former article, tag and series URLs.
+/research/tags/* /tutorials/tags/:splat 301
+/research/series/* /tutorials/series/:splat 301
+/research/:slug /tutorials/:slug/ 301
+/research/:slug/ /tutorials/:slug/ 301

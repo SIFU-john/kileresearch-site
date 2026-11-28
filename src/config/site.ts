@@ -29,6 +29,7 @@ export const site = {
   mediumProfile: (env.PUBLIC_MEDIUM_PROFILE as string | undefined) || undefined,
   nav: [
     { href: '/tutorials/', label: 'Tutorials' },
+    { href: '/research/', label: 'Research' },
     { href: '/consulting/', label: 'Consulting' },
     { href: '/about/', label: 'About' },
   ],
